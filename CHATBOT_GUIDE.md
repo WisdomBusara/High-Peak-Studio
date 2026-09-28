@@ -160,30 +160,42 @@ Conversations stored in Payload CMS collection `chat_conversations`:
 
 ## Phase 2: LLM Integration (Upcoming)
 
-Will integrate OpenAI API:
+Will integrate a free LLM (Ollama, HuggingFace, Replicate, or Together AI).
 
+### Recommended: Ollama (Development)
+Free, self-hosted, runs locally:
 ```typescript
-const response = await openai.chat.completions.create({
-  model: 'gpt-4',
-  messages: [
-    {
-      role: 'system',
-      content: 'You are Highpeak Consultants assistant...'
-    },
-    {
-      role: 'user',
-      content: userMessage
-    }
-  ],
-  temperature: 0.7,
+const response = await fetch('http://localhost:11434/api/chat', {
+  method: 'POST',
+  body: JSON.stringify({
+    model: 'mistral',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are Highpeak Consultants assistant...'
+      },
+      {
+        role: 'user',
+        content: userMessage
+      }
+    ],
+  }),
 })
 ```
+
+### Alternative: Cloud Providers
+- **HuggingFace** - Free tier, easy setup
+- **Replicate** - Free tier, good quality
+- **Together AI** - Free tier, fast, production-ready
+
+See [FREE_LLM_GUIDE.md](FREE_LLM_GUIDE.md) for complete setup instructions.
 
 **Benefits:**
 - Natural language understanding
 - Context awareness
 - Better responses
 - Conversation history
+- Completely free
 
 ## Phase 3: RAG System (Knowledge Base)
 

@@ -5,19 +5,94 @@ import { Hero } from '@/components/sections/Hero'
 import { Container } from '@/components/ui/Container'
 import { Button } from '@/components/ui/Button'
 
+interface FormData {
+  name: string
+  email: string
+  phone: string
+  company: string
+  projectType: string
+  location: string
+  budgetRange: string
+  timeline: string
+  message: string
+  consent: boolean
+}
+
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    projectType: '',
+    location: '',
+    budgetRange: '',
+    timeline: '',
+    message: '',
+    consent: false,
+  })
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }))
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false)
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || undefined,
+          company: formData.company || undefined,
+          projectType: formData.projectType || undefined,
+          location: formData.location || undefined,
+          budgetRange: formData.budgetRange || undefined,
+          timeline: formData.timeline || undefined,
+          message: formData.message,
+          source: 'contact-form',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form')
+      }
+
       setSubmitted(true)
-    }, 1000)
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        projectType: '',
+        location: '',
+        budgetRange: '',
+        timeline: '',
+        message: '',
+        consent: false,
+      })
+    } catch (err) {
+      setError('Failed to submit form. Please try again or contact us directly.')
+      console.error('Form submission error:', err)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -52,13 +127,25 @@ export default function ContactPage() {
             <div className="md:col-span-2">
               {submitted ? (
                 <div className="space-y-4 p-8 bg-surface border border-border">
-                  <h3 className="font-serif text-2xl font-bold">Thank You</h3>
+                  <h3 className="font-serif text-2xl font-bold">Thank You! 🎉</h3>
                   <p className="text-muted">
-                    We've received your message and will get back to you soon. We appreciate your interest in Highpeak.
+                    We've received your message and will get back to you within 24 hours. We appreciate your interest in Highpeak.
                   </p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="text-text hover:underline text-sm"
+                  >
+                    Send another message
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 text-red-800 rounded">
+                      {error}
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium mb-2">
@@ -68,6 +155,8 @@ export default function ContactPage() {
                         type="text"
                         id="name"
                         name="name"
+                        value={formData.name}
+                        onChange={handleChange}
                         required
                         className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
                       />
@@ -80,6 +169,8 @@ export default function ContactPage() {
                         type="email"
                         id="email"
                         name="email"
+                        value={formData.email}
+                        onChange={handleChange}
                         required
                         className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
                       />
@@ -95,6 +186,8 @@ export default function ContactPage() {
                         type="text"
                         id="company"
                         name="company"
+                        value={formData.company}
+                        onChange={handleChange}
                         className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
                       />
                     </div>
@@ -106,27 +199,77 @@ export default function ContactPage() {
                         type="tel"
                         id="phone"
                         name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
                         className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <label htmlFor="projectType" className="block text-sm font-medium mb-2">
-                      Project Type
-                    </label>
-                    <select
-                      id="projectType"
-                      name="projectType"
-                      className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
-                    >
-                      <option>Select a project type</option>
-                      <option>Residential</option>
-                      <option>Commercial</option>
-                      <option>Institutional</option>
-                      <option>Hospitality</option>
-                      <option>Other</option>
-                    </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="projectType" className="block text-sm font-medium mb-2">
+                        Project Type
+                      </label>
+                      <select
+                        id="projectType"
+                        name="projectType"
+                        value={formData.projectType}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
+                      >
+                        <option value="">Select a project type</option>
+                        <option value="residential">Residential</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="institutional">Institutional</option>
+                        <option value="hospitality">Hospitality</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="location" className="block text-sm font-medium mb-2">
+                        Project Location
+                      </label>
+                      <input
+                        type="text"
+                        id="location"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="budgetRange" className="block text-sm font-medium mb-2">
+                        Budget Range
+                      </label>
+                      <input
+                        type="text"
+                        id="budgetRange"
+                        name="budgetRange"
+                        value={formData.budgetRange}
+                        onChange={handleChange}
+                        placeholder="e.g., 1-5M KES"
+                        className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="timeline" className="block text-sm font-medium mb-2">
+                        Project Timeline
+                      </label>
+                      <input
+                        type="text"
+                        id="timeline"
+                        name="timeline"
+                        value={formData.timeline}
+                        onChange={handleChange}
+                        placeholder="e.g., 6 months"
+                        className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -136,26 +279,31 @@ export default function ContactPage() {
                     <textarea
                       id="message"
                       name="message"
+                      value={formData.message}
+                      onChange={handleChange}
                       rows={6}
                       required
+                      placeholder="Tell us about your project..."
                       className="w-full px-4 py-3 border border-border bg-background focus:outline-none focus:border-text resize-none"
                     />
                   </div>
 
-                  <div className="flex items-center">
+                  <div className="flex items-start">
                     <input
                       type="checkbox"
                       id="consent"
                       name="consent"
+                      checked={formData.consent}
+                      onChange={handleChange}
                       required
-                      className="w-4 h-4"
+                      className="w-4 h-4 mt-1"
                     />
                     <label htmlFor="consent" className="ml-2 text-sm text-muted">
-                      I consent to being contacted about this inquiry
+                      I consent to being contacted about this inquiry and understand my information will be securely stored.
                     </label>
                   </div>
 
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button type="submit" disabled={isSubmitting || !formData.consent}>
                     {isSubmitting ? 'Sending...' : 'Send Message'}
                   </Button>
                 </form>
