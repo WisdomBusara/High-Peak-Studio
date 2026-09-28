@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Instrument_Serif, Inter } from 'next/font/google'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 import '@/app/globals.css'
 
 const instrumentSerif = Instrument_Serif({
@@ -20,8 +22,11 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Highpeak Consultants Ltd',
-  description: 'Contemporary architecture and consultancy practice',
+  title: {
+    default: 'Highpeak Consultants Ltd',
+    template: '%s | Highpeak Consultants Ltd',
+  },
+  description: 'Contemporary architecture and consultancy practice based in Nairobi, Kenya',
   openGraph: {
     type: 'website',
     locale: 'en_KE',
@@ -45,7 +50,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#F5F3EE" />
       </head>
       <body className="bg-background text-text antialiased">
+        <Header />
         {children}
+        <Footer />
       </body>
     </html>
   )
