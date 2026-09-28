@@ -20,8 +20,8 @@ Building a complete platform for Highpeak Consultants Ltd:
 - **Frontend**: Next.js 15 + React 19 + TypeScript
 - **Styling**: Tailwind CSS + Instrument Serif + Inter
 - **Database**: PostgreSQL + pgvector
-- **CMS**: Payload CMS (planned)
-- **Media**: Cloudflare R2
+- **CMS**: Payload CMS 3.x
+- **Media**: Local storage (Cloudflare R2 for production)
 - **AI**: OpenAI embeddings
 
 ## Design System
@@ -202,28 +202,43 @@ Building a complete platform for Highpeak Consultants Ltd:
 ## Implementation Order
 
 1. ✅ Project foundation (Next.js, design system, structure)
-2. Public website pages & layouts
-3. Payload CMS setup
-4. PostgreSQL & database models
-5. Media management (R2)
-6. Admin dashboard basics
-7. Lead management
+2. ✅ Public website pages & layouts
+3. ✅ Payload CMS setup & collections
+4. PostgreSQL & database initialization
+5. Media management (R2 production setup)
+6. Admin dashboard with Payload
+7. Lead management interface
 8. Chatbot UI & basic functionality
 9. Knowledge pipeline & embeddings
 10. Versioning & rollback system
-11. Audit logging
-12. Analytics
-13. Security hardening
-14. Performance optimization
+11. Webhook integration for CMS publishing
+12. Audit logging
+13. Analytics
+14. Security hardening
+15. Performance optimization
 
 ## Key Files
 
+### Frontend
 - `app/layout.tsx` - Root layout with fonts and global meta
 - `app/globals.css` - Design tokens and global styles
 - `components/ui/` - Design system components
 - `components/layout/` - Page layout components
+- `components/sections/` - Section components (Hero, Grids, etc)
 - `lib/types.ts` - TypeScript interfaces
 - `lib/constants.ts` - Constants and routes
+- `lib/mockData.ts` - Mock data for development
+
+### API
+- `app/api/projects/` - Projects API routes
+- `app/api/services/` - Services API routes
+- `app/api/articles/` - Articles API routes
+- `app/api/leads/` - Leads creation route
+
+### CMS
+- `src/payload/payload.config.ts` - Payload configuration
+- `src/payload/collections/` - Collection definitions
+- `app/admin/` - Admin panel route
 
 ## Environment Variables
 
