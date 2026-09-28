@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Instrument_Serif, Inter } from 'next/font/google'
 import '@/app/globals.css'
 
 const instrumentSerif = Instrument_Serif({
   variable: '--font-serif',
   subsets: ['latin'],
-  weight: ['400', '700'],
+  weight: ['400'],
 })
 
 const inter = Inter({
@@ -14,10 +14,14 @@ const inter = Inter({
   display: 'swap',
 })
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata: Metadata = {
   title: 'Highpeak Consultants Ltd',
   description: 'Contemporary architecture and consultancy practice',
-  viewport: 'width=device-width, initial-scale=1',
   openGraph: {
     type: 'website',
     locale: 'en_KE',

@@ -20,17 +20,6 @@ const config: Config = {
         serif: ['Instrument Serif', 'serif'],
         sans: ['Inter', 'sans-serif'],
       },
-      typography: {
-        DEFAULT: {
-          css: {
-            color: '#151515',
-            a: {
-              color: '#151515',
-              textDecoration: 'underline',
-            },
-          },
-        },
-      },
       spacing: {
         gutter: 'var(--gutter)',
       },
@@ -41,9 +30,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [],
 }
 
 export default config
