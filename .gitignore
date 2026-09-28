@@ -39,3 +39,7 @@ Thumbs.db
 
 # Misc
 *.pem
+
+# Payload uploads (local dev)
+/media
+*.tsbuildinfo

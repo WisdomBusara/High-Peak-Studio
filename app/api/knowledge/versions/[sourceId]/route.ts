@@ -10,6 +10,11 @@ export async function GET(
   try {
     const payload = await getPayload({ config })
 
+    const { user } = await payload.auth({ headers: request.headers })
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     // Get all versions for this source
     const versions = await payload.find({
       collection: 'knowledge-versions',

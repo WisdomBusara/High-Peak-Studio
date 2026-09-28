@@ -29,11 +29,8 @@ function classifyIntent(message: string): string {
   return 'general_question'
 }
 
-// Simple response generation (placeholder for LLM integration)
-async function generateResponse(message: string, intent: string) {
-  const payload = await getPayload({ config })
-
-  // For MVP, return templated responses based on intent
+// Templated responses until an LLM is integrated
+function generateResponse(intent: string) {
   const responses: Record<string, string> = {
     project_search:
       'I can help you find our projects! We have completed work in residential, commercial, institutional, and hospitality sectors. Would you like to see projects in a specific category?',
@@ -74,7 +71,7 @@ export async function POST(request: Request) {
     const intent = classifyIntent(message)
 
     // Generate response
-    const assistantMessage = await generateResponse(message, intent)
+    const assistantMessage = generateResponse(intent)
 
     // Store conversation (optional - for analytics)
     try {

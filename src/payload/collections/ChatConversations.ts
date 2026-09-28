@@ -1,18 +1,14 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { staffOnly } from '../access'
 
 export const ChatConversations: CollectionConfig = {
   slug: 'chat-conversations',
   admin: {
     useAsTitle: 'id',
     group: 'Chatbot',
-    defaultColumns: ['id', 'createdAt', 'messageCount', 'status'],
+    defaultColumns: ['id', 'intent', 'status', 'createdAt'],
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: staffOnly,
   fields: [
     {
       name: 'messages',
@@ -29,7 +25,7 @@ export const ChatConversations: CollectionConfig = {
         },
         {
           name: 'content',
-          type: 'richText',
+          type: 'textarea',
           required: true,
         },
         {

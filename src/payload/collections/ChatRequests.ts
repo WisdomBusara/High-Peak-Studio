@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { staffOnly } from '../access'
 
 export const ChatRequests: CollectionConfig = {
   slug: 'chat-requests',
@@ -7,12 +8,7 @@ export const ChatRequests: CollectionConfig = {
     group: 'Chatbot',
     defaultColumns: ['requestType', 'status', 'createdAt'],
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: staffOnly,
   fields: [
     {
       name: 'requestType',
@@ -68,11 +64,11 @@ export const ChatRequests: CollectionConfig = {
     },
     {
       name: 'description',
-      type: 'richText',
+      type: 'textarea',
     },
     {
       name: 'notes',
-      type: 'richText',
+      type: 'textarea',
     },
   ],
 }

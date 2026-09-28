@@ -1,19 +1,15 @@
-import { CollectionConfig } from 'payload'
+import path from 'path'
+import type { CollectionConfig } from 'payload'
+import { publicMedia } from '../access'
 
 export const Media: CollectionConfig = {
   slug: 'media',
   admin: {
     group: 'Management',
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: publicMedia,
   upload: {
-    staticDir: 'public/media',
-    staticURL: '/media',
+    staticDir: path.resolve(process.cwd(), 'media'),
     imageSizes: [
       {
         name: 'thumbnail',

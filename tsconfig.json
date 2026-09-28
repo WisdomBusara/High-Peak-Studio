@@ -38,6 +38,9 @@
       ],
       "@/src/*": [
         "./src/*"
+      ],
+      "@payload-config": [
+        "./src/payload/payload.config.ts"
       ]
     },
     "allowJs": true,

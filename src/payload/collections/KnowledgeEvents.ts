@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { staffOnly } from '../access'
 
 export const KnowledgeEvents: CollectionConfig = {
   slug: 'knowledge-events',
@@ -7,12 +8,7 @@ export const KnowledgeEvents: CollectionConfig = {
     group: 'Knowledge',
     defaultColumns: ['eventType', 'status', 'createdAt'],
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: staffOnly,
   fields: [
     {
       name: 'eventType',

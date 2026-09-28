@@ -33,8 +33,15 @@ const eventTypeMap: Record<
 
 export async function POST(request: Request) {
   try {
+    const payload = await getPayload({ config })
+
+    const { user } = await payload.auth({ headers: request.headers })
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = (await request.json()) as WebhookPayload
-    const { event_id, event_type, document_id } = body
+    const { event_type, document_id } = body
 
     // Verify event type is recognized
     const mapping = eventTypeMap[event_type]
@@ -44,8 +51,6 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
-
-    const payload = await getPayload({ config })
 
     // Fetch the published document
     const doc = await payload.findByID({
@@ -82,16 +87,17 @@ export async function POST(request: Request) {
     // Check if content has changed
     const contentHash = hashContent(normalized.text)
 
-    // Create or update knowledge source
-    let knowledgeSource = await payload.find({
+    const existingSource = await payload.find({
       collection: 'knowledge-sources',
       where: {
         sourceId: { equals: document_id },
       },
+      limit: 1,
     })
 
-    if (knowledgeSource.docs.length === 0) {
-      knowledgeSource = await payload.create({
+    const source =
+      existingSource.docs[0] ??
+      (await payload.create({
         collection: 'knowledge-sources',
         data: {
           sourceType: mapping.sourceType,
@@ -101,19 +107,24 @@ export async function POST(request: Request) {
           published: true,
           chatbotVisible: doc.chatbotVisible !== false,
         },
-      })
-    }
+      }))
 
-    const source = knowledgeSource.docs[0] || knowledgeSource
+    const latestVersion = await payload.find({
+      collection: 'knowledge-versions',
+      where: {
+        knowledgeSource: { equals: source.id },
+      },
+      sort: '-versionNumber',
+      limit: 1,
+    })
 
-    // Create new knowledge version
     const chunks = chunkContent(normalized.text)
 
     const newVersion = await payload.create({
       collection: 'knowledge-versions',
       data: {
         knowledgeSource: source.id,
-        versionNumber: (source.versionNumber || 0) + 1,
+        versionNumber: (latestVersion.docs[0]?.versionNumber ?? 0) + 1,
         contentHash,
         normalizedContent: normalized.text,
         status: 'ready', // Ready for activation

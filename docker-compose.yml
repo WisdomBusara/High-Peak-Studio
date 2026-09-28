@@ -1,65 +1,53 @@
-version: '3.8'
+name: highpeak
 
+# Values come from ./.env, which setup-highpeak.sh creates.
 services:
   postgres:
     image: postgres:15-alpine
     container_name: highpeak-db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-highpeak}
-      POSTGRES_USER: ${DB_USER:-highpeak_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: highpeak
+      POSTGRES_USER: highpeak_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is not set - run setup-highpeak.sh}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-highpeak_user}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U highpeak_user -d highpeak"]
+      interval: 5s
       timeout: 5s
-      retries: 5
-    networks:
-      - highpeak-network
+      retries: 20
 
   app:
-    build: .
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${SITE_URL:?SITE_URL is not set - run setup-highpeak.sh}
+    image: highpeak-app
     container_name: highpeak-app
     restart: unless-stopped
     environment:
-      NODE_ENV: production
-      DATABASE_URL: postgres://${DB_USER:-highpeak_user}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-highpeak}
-      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
-      NEXT_PUBLIC_SITE_URL: ${SITE_URL:-https://peak.wisdombusara.com}
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      DB_HOST: postgres
+      DB_USER: highpeak_user
+      DB_NAME: highpeak
+      DB_PASSWORD: ${DB_PASSWORD}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET:?PAYLOAD_SECRET is not set - run setup-highpeak.sh}
+      SITE_URL: ${SITE_URL}
+    # Loopback only: cloudflared on the host is the only thing that should reach it.
     ports:
-      - "3000:3000"
+      - "127.0.0.1:${APP_PORT:-3100}:3000"
+    volumes:
+      - media:/app/media
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./public/media:/app/public/media
-    networks:
-      - highpeak-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: highpeak-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-      - ./certbot/conf:/etc/letsencrypt:ro
-      - ./certbot/www:/var/www/certbot:ro
-    depends_on:
-      - app
-    networks:
-      - highpeak-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/chatbot/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
 volumes:
   postgres_data:
-
-networks:
-  highpeak-network:
-    driver: bridge
+  media:

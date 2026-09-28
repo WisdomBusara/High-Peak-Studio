@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { staffOnly } from '../access'
 
 export const Leads: CollectionConfig = {
   slug: 'leads',
@@ -6,12 +7,7 @@ export const Leads: CollectionConfig = {
     useAsTitle: 'name',
     group: 'Business',
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: staffOnly,
   fields: [
     {
       name: 'name',
@@ -56,7 +52,7 @@ export const Leads: CollectionConfig = {
     },
     {
       name: 'message',
-      type: 'richText',
+      type: 'textarea',
       required: true,
     },
     {
@@ -90,7 +86,7 @@ export const Leads: CollectionConfig = {
     },
     {
       name: 'notes',
-      type: 'richText',
+      type: 'textarea',
     },
   ],
 }

@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { staffOnly } from '../access'
 
 export const KnowledgeChunks: CollectionConfig = {
   slug: 'knowledge-chunks',
@@ -7,12 +8,7 @@ export const KnowledgeChunks: CollectionConfig = {
     group: 'Knowledge',
     hidden: true, // Usually queried via API, not directly
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: staffOnly,
   fields: [
     {
       name: 'knowledgeVersion',
@@ -35,7 +31,7 @@ export const KnowledgeChunks: CollectionConfig = {
     },
     {
       name: 'content',
-      type: 'richText',
+      type: 'textarea',
       required: true,
       admin: {
         description: '400-800 tokens of content',

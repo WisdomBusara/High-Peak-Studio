@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { staffOnly } from '../access'
 
 export const KnowledgeSources: CollectionConfig = {
   slug: 'knowledge-sources',
@@ -7,12 +8,7 @@ export const KnowledgeSources: CollectionConfig = {
     group: 'Knowledge',
     defaultColumns: ['sourceTitle', 'sourceType', 'published', 'chatbotVisible', 'updatedAt'],
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: staffOnly,
   fields: [
     {
       name: 'sourceType',

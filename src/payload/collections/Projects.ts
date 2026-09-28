@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { publicContent } from '../access'
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -6,12 +7,7 @@ export const Projects: CollectionConfig = {
     useAsTitle: 'title',
     group: 'Content',
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: publicContent,
   fields: [
     {
       name: 'title',

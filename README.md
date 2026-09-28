@@ -23,7 +23,7 @@ A premium architecture and consultancy website with CMS, admin dashboard, chatbo
 - **Media**: Cloudflare R2
 - **AI**: OpenAI API for embeddings
 - **Email**: Resend
-- **Deployment**: Vercel
+- **Deployment**: Docker Compose on a VPS behind Cloudflare Tunnel (see [DEPLOY.md](DEPLOY.md))
 
 ## Getting Started
 
@@ -58,15 +58,13 @@ cp .env.example .env.local
 # Edit .env.local with your database credentials
 ```
 
-5. Run database migrations
+5. Database schema: in development Payload syncs the schema automatically. After changing
+   collections, generate a migration and commit it; production applies it on startup:
 ```bash
-npm run payload:migrate
+npm run migrate:create -- <name>
 ```
 
-6. Create admin user
-```bash
-npm run payload:create-user
-```
+6. Create the admin user: open http://localhost:3000/admin and fill in the first-user form.
 
 7. Run development server
 ```bash
@@ -76,7 +74,8 @@ npm run dev
 Access:
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
 - **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin)
-- **API**: [http://localhost:3000/api](http://localhost:3000/api)
+- **Site API**: [http://localhost:3000/api](http://localhost:3000/api)
+- **CMS REST API**: [http://localhost:3000/cms-api](http://localhost:3000/cms-api)
 
 ## Development
 

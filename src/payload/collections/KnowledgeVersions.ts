@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { staffOnly } from '../access'
 
 export const KnowledgeVersions: CollectionConfig = {
   slug: 'knowledge-versions',
@@ -7,12 +8,7 @@ export const KnowledgeVersions: CollectionConfig = {
     group: 'Knowledge',
     defaultColumns: ['versionNumber', 'status', 'chunkCount', 'createdAt'],
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: staffOnly,
   fields: [
     {
       name: 'knowledgeSource',
@@ -35,7 +31,7 @@ export const KnowledgeVersions: CollectionConfig = {
     },
     {
       name: 'normalizedContent',
-      type: 'richText',
+      type: 'textarea',
       required: true,
       admin: {
         description: 'Structured, normalized content for embedding',

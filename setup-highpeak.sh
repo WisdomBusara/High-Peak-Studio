@@ -1,306 +1,147 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Deploys Highpeak on this host: Postgres + the Next.js/Payload app in Docker,
+# reachable only on 127.0.0.1 (Cloudflare Tunnel forwards public traffic to it).
+# Safe to re-run: an existing .env is reused, so the database password never drifts.
+set -euo pipefail
+cd "$(dirname "$0")"
 
-#############################################################################
-# Highpeak Platform - Complete Setup Script
-# Generates secrets, creates .env.local, and deploys via Cloudflare Tunnel
-#############################################################################
+red()   { printf '\033[0;31m%s\033[0m\n' "$*"; }
+green() { printf '\033[0;32m%s\033[0m\n' "$*"; }
+info()  { printf '\n\033[0;34m==>\033[0m %s\n' "$*"; }
+fail()  { red "ERROR: $*"; exit 1; }
 
-set -e
+command -v docker >/dev/null || fail "docker is not installed"
+docker compose version >/dev/null 2>&1 || fail "'docker compose' (v2) is required"
+command -v openssl >/dev/null || fail "openssl is not installed"
+command -v curl >/dev/null || fail "curl is not installed"
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log_info() { echo -e "${BLUE}➜${NC} $1"; }
-log_success() { echo -e "${GREEN}✓${NC} $1"; }
-log_error() { echo -e "${RED}✗${NC} $1"; }
-
-#############################################################################
-# STEP 1: Verify Prerequisites
-#############################################################################
-
-log_info "Checking prerequisites..."
-
-if [ ! -f "docker-compose.yml" ]; then
-  log_error "docker-compose.yml not found. Run from /opt/highpeak"
-  exit 1
-fi
-
-# Check for docker compose (v2 preferred over old v1)
-if ! command -v docker &> /dev/null; then
-  log_error "Docker not installed"
-  exit 1
-fi
-
-if ! command -v openssl &> /dev/null; then
-  log_error "OpenSSL not installed"
-  exit 1
-fi
-
-log_success "Prerequisites verified"
-echo ""
-
-#############################################################################
-# STEP 2: Generate Secure Secrets
-#############################################################################
-
-log_info "Generating secure secrets..."
-
-# Generate random passwords and secrets
-DB_PASSWORD=$(openssl rand -base64 32)
-PAYLOAD_SECRET=$(openssl rand -base64 32)
-DB_USER="highpeak_user"
-DB_NAME="highpeak"
-
-log_success "Secrets generated"
-echo ""
-
-#############################################################################
-# STEP 3: Prompt for Configuration
-#############################################################################
-
-log_info "Configure your deployment..."
-echo ""
-
-read -p "$(echo -e ${BLUE}?)$(echo -e ${NC}) Enter domain (default: peak.wisdombusara.com): " DOMAIN
-DOMAIN=${DOMAIN:-peak.wisdombusara.com}
-
-read -p "$(echo -e ${BLUE}?)$(echo -e ${NC}) Enter NODE_ENV (default: production): " NODE_ENV
-NODE_ENV=${NODE_ENV:-production}
-
-read -p "$(echo -e ${BLUE}?)$(echo -e ${NC}) OpenAI API Key (optional, press Enter to skip): " OPENAI_API_KEY
-OPENAI_API_KEY=${OPENAI_API_KEY:-}
-
-echo ""
-
-#############################################################################
-# STEP 4: Create .env.local
-#############################################################################
-
-log_info "Creating .env.local..."
-
-cat > .env.local << EOF
-# Highpeak Environment Configuration
-# Generated: $(date)
-
-# Node Environment
-NODE_ENV=${NODE_ENV}
-
-# Site Configuration
-NEXT_PUBLIC_SITE_URL=https://${DOMAIN}
-
-# Database Configuration
-DB_USER=${DB_USER}
-DB_PASSWORD=${DB_PASSWORD}
-DB_NAME=${DB_NAME}
-DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
-
-# Payload CMS Secret
-PAYLOAD_SECRET=${PAYLOAD_SECRET}
-
-# Optional: OpenAI Integration
-EOF
-
-if [ -n "$OPENAI_API_KEY" ]; then
-  echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> .env.local
+# ---------------------------------------------------------------- 1. .env
+if [ -f .env ]; then
+  info "Using existing .env"
 else
-  echo "# OPENAI_API_KEY=sk-..." >> .env.local
-fi
-
-cat >> .env.local << 'EOF'
-
-# Optional: Cloudflare R2 Storage
-# R2_ACCESS_KEY_ID=
-# R2_SECRET_ACCESS_KEY=
-# R2_BUCKET_NAME=
-# NEXT_PUBLIC_R2_URL=
-
-# Optional: Analytics
-# NEXT_PUBLIC_ANALYTICS_ID=
-
-# Optional: Email
-# RESEND_API_KEY=
-EOF
-
-log_success ".env.local created"
-echo ""
-
-#############################################################################
-# STEP 5: Display Configuration
-#############################################################################
-
-log_info "Configuration Summary:"
-echo ""
-echo "  Domain:              ${DOMAIN}"
-echo "  Environment:         ${NODE_ENV}"
-echo "  Database User:       ${DB_USER}"
-echo "  Database Name:       ${DB_NAME}"
-echo "  Database Password:   ${DB_PASSWORD:0:15}..."
-echo "  Payload Secret:      ${PAYLOAD_SECRET:0:15}..."
-if [ -n "$OPENAI_API_KEY" ]; then
-  echo "  OpenAI Key:          Set ✓"
-else
-  echo "  OpenAI Key:          Not set (optional)"
-fi
-echo ""
-
-read -p "$(echo -e ${YELLOW}⚠${NC}) Continue with deployment? (y/n): " CONFIRM
-if [ "$CONFIRM" != "y" ]; then
-  log_error "Deployment cancelled"
-  exit 1
-fi
-
-echo ""
-
-#############################################################################
-# STEP 6: Deploy Docker Services
-#############################################################################
-
-log_info "Deploying Docker services..."
-
-# Use docker compose v2 instead of old docker-compose
-DOCKER_CMD="docker compose"
-
-# Check which command to use
-if ! $DOCKER_CMD version &>/dev/null; then
-  log_info "docker compose v2 not found, trying docker-compose v1..."
-  DOCKER_CMD="docker-compose"
-fi
-
-# Build image
-log_info "Building Docker image (this may take 2-3 minutes)..."
-$DOCKER_CMD build --no-cache 2>&1 | grep -E "Step|Successfully|ERROR" || true
-
-log_success "Docker image built"
-
-# Start services
-log_info "Starting services..."
-$DOCKER_CMD up -d
-
-log_success "Services started"
-
-# Wait for database
-log_info "Waiting for database to be ready..."
-for i in {1..30}; do
-  if $DOCKER_CMD exec -T postgres pg_isready -U ${DB_USER} &> /dev/null; then
-    log_success "Database is ready"
-    break
+  if docker volume inspect highpeak_postgres_data >/dev/null 2>&1; then
+    red "A database volume from an earlier run exists, but .env is missing."
+    echo "That database keeps the password it was created with. Either restore the old .env,"
+    echo "or, if the database holds nothing you need, delete it and re-run:"
+    echo "    docker compose down -v && bash setup-highpeak.sh"
+    exit 1
   fi
-  echo -n "."
-  sleep 2
-done
 
-echo ""
+  info "Creating .env"
+  read -rp "Public domain [peak.wisdombusara.com]: " DOMAIN
+  DOMAIN=${DOMAIN:-peak.wisdombusara.com}
+  read -rp "Local port for the app [3100]: " APP_PORT
+  APP_PORT=${APP_PORT:-3100}
+  [[ "$APP_PORT" =~ ^[0-9]+$ ]] || fail "Port must be a number"
 
-# Show status
-log_info "Service status:"
-$DOCKER_CMD ps
-echo ""
+  while true; do
+    read -rsp "Database password (press Enter to generate one): " DB_PASSWORD; echo
+    if [ -z "$DB_PASSWORD" ]; then
+      DB_PASSWORD=$(openssl rand -hex 24)
+      echo "Generated a random database password (stored in .env)."
+      break
+    fi
+    if [ ${#DB_PASSWORD} -lt 12 ]; then red "Use at least 12 characters."; continue; fi
+    case "$DB_PASSWORD" in *"'"*) red "The password cannot contain a single quote."; continue ;; esac
+    read -rsp "Repeat database password: " CONFIRM; echo
+    [ "$DB_PASSWORD" = "$CONFIRM" ] && break
+    red "Passwords did not match."
+  done
 
-#############################################################################
-# STEP 7: Initialize Database
-#############################################################################
-
-log_info "Initializing database..."
-
-log_info "Running migrations..."
-$DOCKER_CMD exec -T app npm run payload:migrate 2>&1 | tail -5 || true
-
-log_success "Database initialized"
-echo ""
-
-#############################################################################
-# STEP 8: Create Admin User
-#############################################################################
-
-log_info "Creating admin user..."
-echo ""
-
-read -p "$(echo -e ${BLUE}?)$(echo -e ${NC}) Admin email: " ADMIN_EMAIL
-read -sp "$(echo -e ${BLUE}?)$(echo -e ${NC}) Admin password: " ADMIN_PASSWORD
-echo ""
-
-$DOCKER_CMD exec -T app npm run payload:create-user -- \
-  --email "$ADMIN_EMAIL" \
-  --password "$ADMIN_PASSWORD" 2>&1 | tail -3 || true
-
-log_success "Admin user creation initiated"
-echo ""
-
-#############################################################################
-# STEP 9: Verify Cloudflare Tunnel
-#############################################################################
-
-log_info "Checking Cloudflare Tunnel..."
-
-if sudo systemctl is-active --quiet cloudflared; then
-  log_success "Cloudflare Tunnel is running"
-  TUNNEL_STATUS=$(cloudflared tunnel info highpeak 2>&1 | head -3 || echo "Tunnel info unavailable")
-  echo "  $TUNNEL_STATUS"
-else
-  log_error "Cloudflare Tunnel is NOT running"
-  log_info "To start: sudo systemctl start cloudflared"
+  (
+    umask 077
+    cat > .env <<EOF
+SITE_URL=https://${DOMAIN}
+APP_PORT=${APP_PORT}
+DB_PASSWORD='${DB_PASSWORD}'
+PAYLOAD_SECRET=$(openssl rand -hex 32)
+EOF
+  )
+  green ".env written (readable by root only)"
 fi
 
-echo ""
+set -a; . ./.env; set +a
+DOMAIN=${SITE_URL#https://}
 
-#############################################################################
-# SUMMARY
-#############################################################################
+# ---------------------------------------------------------------- 2. port
+if ss -Hltn "sport = :${APP_PORT}" | grep -q . && [ -z "$(docker compose ps -q app 2>/dev/null)" ]; then
+  fail "Port ${APP_PORT} is already used by something else on this host. Change APP_PORT in .env and re-run."
+fi
 
-echo -e "${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║         Highpeak Deployment Complete! 🎉                   ║${NC}"
-echo -e "${GREEN}╚══════════════════════════════════════════════════════════════╝${NC}"
-echo ""
+# ---------------------------------------------------------------- 3. build + start
+info "Building the app image (the first build takes several minutes)"
+docker compose build app
 
-echo -e "${GREEN}✓ Configuration saved to: .env.local${NC}"
-echo ""
+info "Starting database and app"
+docker compose up -d
 
-echo -e "${BLUE}📌 NEXT STEPS:${NC}"
-echo ""
+# ---------------------------------------------------------------- 4. readiness
+info "Waiting for the app (database migrations run on first start)"
+ready=0
+for _ in $(seq 1 60); do
+  if curl -fsS --max-time 5 "http://127.0.0.1:${APP_PORT}/api/chatbot/health" >/dev/null 2>&1; then ready=1; break; fi
+  sleep 3
+done
+if [ "$ready" != 1 ]; then
+  red "The app did not start. Last log lines:"
+  docker compose logs --tail=80 app
+  exit 1
+fi
 
-echo "1. ${YELLOW}Verify Cloudflare Tunnel DNS${NC}"
-echo "   In Cloudflare Dashboard:"
-echo "   - Domain: wisdombusara.com"
-echo "   - DNS → Add CNAME Record"
-echo "   - Name: peak"
-echo "   - Target: 7769d2c1-8f71-4486-b96a-45cc10a284e6.cfargotunnel.com"
-echo "   - Proxied: ✅ ON"
-echo ""
+# This call initialises Payload, which connects to Postgres and applies migrations.
+if ! INIT=$(curl -fsS --max-time 180 "http://127.0.0.1:${APP_PORT}/cms-api/users/init"); then
+  red "The app is up but could not initialise the database. Last log lines:"
+  docker compose logs --tail=80 app
+  exit 1
+fi
+green "App and database are running"
 
-echo "2. ${YELLOW}Test your deployment${NC}"
-echo "   Wait 30-60 seconds for DNS propagation, then:"
-echo "   curl -I https://${DOMAIN}"
-echo ""
+# ---------------------------------------------------------------- 5. first admin
+# Created here over loopback, before the site is public, so nobody else can claim the first account.
+if echo "$INIT" | grep -q '"initialized":false'; then
+  info "Create the first CMS admin account"
+  read -rp "Admin email: " ADMIN_EMAIL
+  while true; do
+    read -rsp "Admin password (min 8 characters): " ADMIN_PASSWORD; echo
+    if [ ${#ADMIN_PASSWORD} -lt 8 ]; then red "Too short."; continue; fi
+    read -rsp "Repeat admin password: " CONFIRM; echo
+    [ "$ADMIN_PASSWORD" = "$CONFIRM" ] && break
+    red "Passwords did not match."
+  done
+  export ADMIN_EMAIL ADMIN_PASSWORD
+  docker compose exec -T -e ADMIN_EMAIL -e ADMIN_PASSWORD app node -e \
+    'process.stdout.write(JSON.stringify({email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD, name: "Admin", role: "super-admin"}))' \
+    | curl -fsS -X POST -H 'Content-Type: application/json' --data-binary @- \
+      "http://127.0.0.1:${APP_PORT}/cms-api/users/first-register" >/dev/null \
+    || fail "Could not create the admin user (see: docker compose logs app)"
+  unset ADMIN_PASSWORD
+  green "Admin account created: ${ADMIN_EMAIL}"
+else
+  info "A CMS admin account already exists - skipping"
+fi
 
-echo "3. ${YELLOW}Access your platform${NC}"
-echo "   Website:  https://${DOMAIN}"
-echo "   Admin:    https://${DOMAIN}/admin"
-echo "   Email:    ${ADMIN_EMAIL}"
-echo ""
+# ---------------------------------------------------------------- 6. tunnel instructions
+TUNNEL=$(awk '/^tunnel:/ {print $2}' /etc/cloudflared/config.yml 2>/dev/null || true)
 
-echo -e "${GREEN}📊 Service Information:${NC}"
-echo "   Database User:  ${DB_USER}"
-echo "   Database:       ${DB_NAME}"
-echo "   Container Port: 3000 → localhost:3000"
-echo ""
+green "
+Highpeak is running on http://127.0.0.1:${APP_PORT}
+"
+cat <<EOF
+Last step - publish it at https://${DOMAIN} through cloudflared.
+This script does not edit the tunnel config, because other sites depend on it.
 
-echo -e "${GREEN}🔧 Useful Commands:${NC}"
-echo "   Check status:    docker compose ps"
-echo "   View logs:       docker compose logs -f app"
-echo "   Restart:         docker compose restart"
-echo "   Stop:            docker compose down"
-echo "   Database backup: docker compose exec -T postgres pg_dump -U ${DB_USER} ${DB_NAME} > backup.sql"
-echo ""
+  1. In /etc/cloudflared/config.yml add these two lines directly ABOVE the final
+     '- service: http_status:404' line. Leave every other rule as it is:
 
-echo -e "${YELLOW}💾 Important Files:${NC}"
-echo "   Environment:     .env.local (keep secure!)"
-echo "   Tunnel Config:   /etc/cloudflared/config.yml"
-echo "   Tunnel Status:   sudo systemctl status cloudflared"
-echo ""
+       - hostname: ${DOMAIN}
+         service: http://127.0.0.1:${APP_PORT}
 
-log_success "Setup complete! Your Highpeak platform is ready to serve traffic."
-log_info "Visit https://${DOMAIN} once DNS propagates (30-60 seconds)"
+  2. sudo cloudflared --config /etc/cloudflared/config.yml tunnel ingress validate
+  3. sudo systemctl restart cloudflared
+  4. sudo cloudflared tunnel route dns --overwrite-dns ${TUNNEL:-<tunnel name from config.yml>} ${DOMAIN}
+
+Then open https://${DOMAIN}/admin and log in.
+
+Useful:  docker compose ps | docker compose logs -f app | docker compose restart app
+Update:  git pull && bash setup-highpeak.sh
+EOF

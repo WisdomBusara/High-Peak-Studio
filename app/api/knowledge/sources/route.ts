@@ -1,25 +1,16 @@
 import { getPayload } from 'payload'
 import config from '@/src/payload'
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const includeInactive = searchParams.get('includeInactive') === 'true'
-
+export async function GET() {
   try {
     const payload = await getPayload({ config })
 
-    const where: any = {
-      published: {
-        equals: true,
-      },
-      chatbotVisible: {
-        equals: true,
-      },
-    }
-
     const sources = await payload.find({
       collection: 'knowledge-sources',
-      where,
+      where: {
+        published: { equals: true },
+        chatbotVisible: { equals: true },
+      },
       limit: 1000,
     })
 

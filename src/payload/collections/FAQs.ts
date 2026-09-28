@@ -1,4 +1,5 @@
-import { CollectionConfig } from 'payload'
+import type { CollectionConfig } from 'payload'
+import { publicContent } from '../access'
 
 export const FAQs: CollectionConfig = {
   slug: 'faqs',
@@ -6,12 +7,7 @@ export const FAQs: CollectionConfig = {
     useAsTitle: 'question',
     group: 'Chatbot',
   },
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-    delete: () => true,
-  },
+  access: publicContent,
   fields: [
     {
       name: 'question',
