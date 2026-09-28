@@ -1,0 +1,34 @@
+import { getPayload } from 'payload'
+import config from '@/src/payload'
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const includeInactive = searchParams.get('includeInactive') === 'true'
+
+  try {
+    const payload = await getPayload({ config })
+
+    const where: any = {
+      published: {
+        equals: true,
+      },
+      chatbotVisible: {
+        equals: true,
+      },
+    }
+
+    const sources = await payload.find({
+      collection: 'knowledge-sources',
+      where,
+      limit: 1000,
+    })
+
+    return Response.json(sources)
+  } catch (error) {
+    console.error('Error fetching knowledge sources:', error)
+    return Response.json(
+      { error: 'Failed to fetch knowledge sources' },
+      { status: 500 }
+    )
+  }
+}

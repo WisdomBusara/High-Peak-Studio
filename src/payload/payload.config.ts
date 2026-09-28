@@ -9,6 +9,10 @@ import { Users } from './collections/Users'
 import { ChatConversations } from './collections/ChatConversations'
 import { ChatRequests } from './collections/ChatRequests'
 import { FAQs } from './collections/FAQs'
+import { KnowledgeSources } from './collections/KnowledgeSources'
+import { KnowledgeVersions } from './collections/KnowledgeVersions'
+import { KnowledgeChunks } from './collections/KnowledgeChunks'
+import { KnowledgeEvents } from './collections/KnowledgeEvents'
 
 export default buildConfig({
   admin: {
@@ -24,6 +28,10 @@ export default buildConfig({
     ChatConversations,
     ChatRequests,
     FAQs,
+    KnowledgeSources,
+    KnowledgeVersions,
+    KnowledgeChunks,
+    KnowledgeEvents,
   ],
   db: postgresAdapter({
     url: process.env.DATABASE_URL || 'postgres://localhost:5432/highpeak',
