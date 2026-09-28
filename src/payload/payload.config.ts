@@ -1,5 +1,4 @@
 import { buildConfig } from 'payload'
-import { postgresAdapter } from '@payloadcms/db-postgres'
 import { Projects } from './collections/Projects'
 import { Services } from './collections/Services'
 import { Articles } from './collections/Articles'
@@ -33,9 +32,10 @@ export default buildConfig({
     KnowledgeChunks,
     KnowledgeEvents,
   ],
-  db: postgresAdapter({
+  db: {
+    type: 'postgres',
     url: process.env.DATABASE_URL || 'postgres://localhost:5432/highpeak',
-  }),
+  },
   typescript: {
     outputFile: 'src/payload/generated-types.ts',
   },
