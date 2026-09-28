@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Instrument_Serif, Inter } from 'next/font/google'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { Chatbot } from '@/components/chatbot/Chatbot'
 import '@/app/globals.css'
 
 const instrumentSerif = Instrument_Serif({
@@ -53,6 +54,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        <Chatbot initialMessage="How can I help you today?" />
       </body>
     </html>
   )

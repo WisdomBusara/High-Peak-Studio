@@ -30,6 +30,7 @@ A premium architecture and consultancy website with CMS, admin dashboard, chatbo
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
+- PostgreSQL 12+
 
 ### Installation
 
@@ -44,18 +45,38 @@ cd High-Peak-Studio
 npm install
 ```
 
-3. Set up environment variables
+3. Set up PostgreSQL database
+See [DATABASE_SETUP.md](DATABASE_SETUP.md) for complete instructions:
 ```bash
-cp .env.example .env.local
-# Edit .env.local with your configuration
+# Create database and user
+createdb -U postgres highpeak
 ```
 
-4. Run development server
+4. Set up environment variables
+```bash
+cp .env.example .env.local
+# Edit .env.local with your database credentials
+```
+
+5. Run database migrations
+```bash
+npm run payload:migrate
+```
+
+6. Create admin user
+```bash
+npm run payload:create-user
+```
+
+7. Run development server
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Access:
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Admin Panel**: [http://localhost:3000/admin](http://localhost:3000/admin)
+- **API**: [http://localhost:3000/api](http://localhost:3000/api)
 
 ## Development
 
@@ -93,15 +114,15 @@ The project uses a cohesive design system based on:
 ## Implementation Order
 
 1. ✅ Project foundation
-2. Design system and basic components
-3. Public website pages
-4. Payload CMS setup
-5. PostgreSQL and database models
-6. Media management (R2)
-7. Admin dashboard
-8. Lead management
-9. Chatbot UI
-10. Knowledge pipeline
+2. ✅ Design system and basic components
+3. ✅ Public website pages (13 routes)
+4. ✅ Payload CMS setup (6 collections)
+5. ✅ Database & Chatbot foundation
+6. → LLM integration (OpenAI)
+7. → Knowledge pipeline (RAG)
+8. → Admin dashboard enhancements
+9. → Lead qualification workflow
+10. → Analytics & monitoring
 
 ## Principles
 
@@ -112,6 +133,26 @@ The project uses a cohesive design system based on:
 - **Responsive**: Mobile-first design
 - **Traceable**: Full audit trails and source attribution
 
-## Related Documentation
+## Documentation
 
-See `Highpeak-Consultants-Complete-Platform-Specification.md` for complete requirements.
+- **[Highpeak-Consultants-Complete-Platform-Specification.md](Highpeak-Consultants-Complete-Platform-Specification.md)** - Complete platform requirements
+- **[CLAUDE.md](CLAUDE.md)** - Implementation guide and architecture
+- **[DATABASE_SETUP.md](DATABASE_SETUP.md)** - PostgreSQL setup and configuration
+- **[PAYLOAD_SETUP.md](PAYLOAD_SETUP.md)** - Payload CMS configuration
+- **[CHATBOT_GUIDE.md](CHATBOT_GUIDE.md)** - Chatbot architecture and development
+
+## Features
+
+### Phase 1: Foundation ✅
+- Next.js 15 + React 19 + TypeScript
+- Design system with responsive layout
+- 13 public website pages
+- Payload CMS with 6 collections
+- PostgreSQL database
+- Chatbot UI with API
+
+### Phase 2: Upcoming
+- OpenAI LLM integration
+- Knowledge base and RAG
+- Advanced analytics
+- Admin dashboard enhancements
