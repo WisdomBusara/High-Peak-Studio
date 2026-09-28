@@ -1,0 +1,112 @@
+@import '@tailwindcss/typography';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #F5F3EE;
+  --surface: #EAE7DF;
+  --text: #151515;
+  --muted: #686762;
+  --border: #C9C6BD;
+  --dark: #111111;
+  --light: #F7F6F2;
+  --gutter: 1rem;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 2rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1a1815;
+    --surface: #2a2620;
+    --text: #f5f3ee;
+    --muted: #9b9894;
+    --border: #4a4740;
+    --dark: #ffffff;
+    --light: #2a2620;
+  }
+}
+
+* {
+  @apply antialiased;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background text-text transition-colors;
+}
+
+a {
+  @apply transition-colors;
+}
+
+button {
+  @apply transition-all;
+}
+
+/* Fluid typography */
+h1 {
+  @apply font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight;
+}
+
+h2 {
+  @apply font-serif text-3xl md:text-4xl font-bold leading-tight;
+}
+
+h3 {
+  @apply font-serif text-2xl md:text-3xl font-bold leading-tight;
+}
+
+h4 {
+  @apply font-serif text-xl md:text-2xl font-bold;
+}
+
+h5 {
+  @apply font-serif text-lg font-bold;
+}
+
+h6 {
+  @apply font-sans text-base font-bold uppercase tracking-wide;
+}
+
+p {
+  @apply leading-relaxed;
+}
+
+/* Focus states */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-text;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    @apply animation-none transition-none;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted;
+}
