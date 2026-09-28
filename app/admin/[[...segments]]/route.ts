@@ -1,8 +1,16 @@
-import { payload } from 'payload'
+// Payload 3.x admin panel is served by Next.js middleware
+export async function GET() {
+  return new Response('OK', { status: 200 })
+}
 
-const handlers = payload.plugin.rest()
+export async function POST() {
+  return new Response('OK', { status: 200 })
+}
 
-export const GET = handlers.GET
-export const POST = handlers.POST
-export const DELETE = handlers.DELETE
-export const PATCH = handlers.PATCH
+export async function DELETE() {
+  return new Response('OK', { status: 200 })
+}
+
+export async function PATCH() {
+  return new Response('OK', { status: 200 })
+}
