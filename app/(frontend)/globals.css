@@ -114,6 +114,69 @@ p {
   animation: hero-settle 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
+/* Project reel (components/sections/ProjectReel.tsx) */
+@keyframes reel-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.reel-progress {
+  transform-origin: left;
+  animation: reel-progress var(--reel-duration, 6.5s) linear forwards;
+}
+
+[data-paused='true'] .reel-progress {
+  animation-play-state: paused;
+}
+
+@keyframes reel-title {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reel-title {
+  animation: reel-title 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* News ticker */
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track {
+  animation: ticker 60s linear infinite;
+}
+
+.ticker:hover .ticker-track,
+.ticker:focus-within .ticker-track {
+  animation-play-state: paused;
+}
+
+.pictogram * {
+  vector-effect: non-scaling-stroke;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

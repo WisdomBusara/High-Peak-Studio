@@ -51,6 +51,10 @@ export function Header() {
           Highpeak
         </Link>
 
+        <p className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 text-[11px] uppercase tracking-[0.25em] opacity-70 xl:block">
+          Nairobi · 1°17′ S 36°49′ E
+        </p>
+
         <nav aria-label="Main" className="hidden items-center gap-10 md:flex">
           {NAV.map((item) => (
             <Link

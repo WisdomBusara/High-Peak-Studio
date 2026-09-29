@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { Hero } from '@/components/sections/Hero'
 import { CtaBand } from '@/components/sections/CtaBand'
+import { ProcessSteps } from '@/components/sections/ProcessSteps'
+import { TeamGrid } from '@/components/sections/TeamGrid'
 import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
+import { getTeam } from '@/lib/content'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'About',
@@ -25,7 +29,9 @@ const VALUES = [
   },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const team = await getTeam()
+
   return (
     <>
       <Hero
@@ -69,36 +75,29 @@ export default function AboutPage() {
       </section>
 
       <section className="py-24 md:py-36">
-        <Container className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-          <Reveal className="relative aspect-[4/5] overflow-hidden bg-surface lg:col-span-5">
-            <Image
-              src="/images/service-design.jpg"
-              alt="Architectural drawings and drafting tools on a desk"
-              fill
-              sizes="(min-width: 1024px) 42vw, 100vw"
-              className="object-cover"
-            />
-          </Reveal>
-          <Reveal className="lg:col-span-7">
-            <p className="eyebrow text-muted">Our approach</p>
-            <h2 className="mt-4 text-4xl leading-[1.05] md:text-6xl">
-              Great architecture emerges from deep engagement with a project&rsquo;s context.
-            </h2>
-            <div className="mt-8 space-y-5 text-lg text-muted">
-              <p>
-                We invest time in understanding client aspirations, site conditions, community needs, and cultural
-                significance.
+        <Container>
+          <div className="mb-16 grid gap-10 lg:grid-cols-12">
+            <p className="eyebrow text-muted lg:col-span-4">How we work</p>
+            <Reveal className="lg:col-span-8">
+              <h2 className="text-4xl leading-[1.05] md:text-6xl">
+                Great architecture emerges from deep engagement with a project&rsquo;s context.
+              </h2>
+              <p className="mt-6 max-w-2xl text-lg text-muted">
+                We believe the best solutions emerge when technical expertise meets thoughtful design thinking.
               </p>
-              <p>
-                This foundation informs our design process, which combines rigorous analysis with creative exploration.
-                We believe that the best solutions emerge when technical expertise meets thoughtful design thinking.
-              </p>
-              <p>
-                From concept through completion, we maintain close collaboration with our clients and project teams to
-                ensure that the finished work reflects the vision and values that inspired it.
-              </p>
-            </div>
-          </Reveal>
+            </Reveal>
+          </div>
+          <ProcessSteps />
+        </Container>
+      </section>
+
+      <section className="border-t border-border py-24 md:py-36">
+        <Container>
+          <div className="mb-16 grid gap-10 lg:grid-cols-12">
+            <p className="eyebrow text-muted lg:col-span-4">The team</p>
+            <h2 className="text-4xl leading-[1.05] md:text-6xl lg:col-span-8">The people behind the work.</h2>
+          </div>
+          <TeamGrid members={team} />
         </Container>
       </section>
 

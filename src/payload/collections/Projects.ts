@@ -93,9 +93,27 @@ export const Projects: CollectionConfig = {
       ],
     },
     {
+      name: 'drawing',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'Line drawing or diagram of the building, shown on the project page',
+      },
+    },
+    {
       name: 'published',
       type: 'checkbox',
       defaultValue: false,
+    },
+    {
+      name: 'featured',
+      type: 'checkbox',
+      label: 'Show on home page',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'Featured projects play in the full-screen reel at the top of the home page',
+      },
     },
     {
       name: 'chatbotVisible',

@@ -17,6 +17,8 @@ import { KnowledgeSources } from './collections/KnowledgeSources'
 import { KnowledgeVersions } from './collections/KnowledgeVersions'
 import { KnowledgeChunks } from './collections/KnowledgeChunks'
 import { KnowledgeEvents } from './collections/KnowledgeEvents'
+import { TeamMembers } from './collections/TeamMembers'
+import { PressItems } from './collections/PressItems'
 
 const siteUrl = process.env.SITE_URL
 
@@ -37,6 +39,8 @@ export default buildConfig({
     Projects,
     Services,
     Articles,
+    TeamMembers,
+    PressItems,
     Media,
     Leads,
     ChatConversations,

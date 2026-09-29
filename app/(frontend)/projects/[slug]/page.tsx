@@ -8,6 +8,8 @@ import { Container } from '@/components/ui/Container'
 import { ButtonLink } from '@/components/ui/Button'
 import { Reveal } from '@/components/ui/Reveal'
 import { RichContent } from '@/components/ui/RichContent'
+import { Pictogram, pictogramFor } from '@/components/ui/Pictogram'
+import { SampleTag } from '@/components/ui/SampleTag'
 import { PROJECT_STATUSES } from '@/lib/constants'
 import { getProjects } from '@/lib/content'
 
@@ -78,6 +80,40 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </Reveal>
         </Container>
       </section>
+
+      {(project.drawing || project.sample) && (
+        <section className="bg-laterite-light py-20 text-laterite-deep md:py-28">
+          <Container className="grid items-center gap-10 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <p className="eyebrow text-laterite">Drawing</p>
+              <p className="mt-4 font-serif text-3xl md:text-4xl">{project.title}</p>
+              <p className="mt-2 text-sm opacity-75">
+                {project.location} · {project.year}
+              </p>
+              {!project.drawing && <SampleTag className="mt-5" />}
+            </div>
+            <Reveal className="lg:col-span-8">
+              {project.drawing ? (
+                <div className="relative aspect-[16/10] bg-light">
+                  <Image
+                    src={project.drawing.src}
+                    alt={project.drawing.alt}
+                    fill
+                    sizes="(min-width: 1024px) 66vw, 100vw"
+                    className="object-contain p-6 md:p-10"
+                  />
+                </div>
+              ) : (
+                <Pictogram
+                  kind={pictogramFor(project)}
+                  title={`Line drawing of ${project.title}`}
+                  className="mx-auto h-64 w-64 text-laterite md:h-[26rem] md:w-[26rem]"
+                />
+              )}
+            </Reveal>
+          </Container>
+        </section>
+      )}
 
       {project.gallery && project.gallery.length > 0 && (
         <section className="pb-24 md:pb-32">

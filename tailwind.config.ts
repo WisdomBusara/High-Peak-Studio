@@ -15,6 +15,12 @@ const config: Config = {
         border: '#C9C6BD',
         dark: '#111111',
         light: '#F7F6F2',
+        // Accent: the red-brown of Kenyan laterite soil
+        laterite: {
+          DEFAULT: '#8E4A2F',
+          light: '#EFE3DC',
+          deep: '#5E2E1B',
+        },
       },
       fontFamily: {
         serif: ['Instrument Serif', 'serif'],

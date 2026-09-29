@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Hero } from '@/components/sections/Hero'
-import { ProjectExplorer } from '@/components/sections/ProjectExplorer'
+import { ProjectIndex } from '@/components/sections/ProjectIndex'
 import { CtaBand } from '@/components/sections/CtaBand'
 import { Container } from '@/components/ui/Container'
 import { getProjects } from '@/lib/content'
@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   description: 'Residential, commercial, institutional and hospitality projects by Highpeak Consultants.',
 }
 
-export default async function ProjectsPage() {
-  const projects = await getProjects()
+export default async function ProjectsPage({ searchParams }: { searchParams: Promise<{ sector?: string }> }) {
+  const [projects, { sector }] = await Promise.all([getProjects(), searchParams])
 
   return (
     <>
@@ -26,7 +26,7 @@ export default async function ProjectsPage() {
       />
       <section className="py-20 md:py-28">
         <Container>
-          <ProjectExplorer projects={projects} />
+          <ProjectIndex projects={projects} initialSector={sector} />
         </Container>
       </section>
       <CtaBand />

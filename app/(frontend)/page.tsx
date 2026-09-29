@@ -1,65 +1,76 @@
 import Link from 'next/link'
-import { Hero } from '@/components/sections/Hero'
+import { ProjectReel } from '@/components/sections/ProjectReel'
+import { Ticker, type TickerItem } from '@/components/sections/Ticker'
 import { ProjectCard } from '@/components/sections/ProjectCard'
-import { ServiceGrid } from '@/components/sections/ServiceGrid'
+import { SectorPanels } from '@/components/sections/SectorPanels'
+import { ServiceRows } from '@/components/sections/ServiceRows'
 import { ArticleGrid } from '@/components/sections/ArticleGrid'
+import { PressSection } from '@/components/sections/PressSection'
 import { CtaBand } from '@/components/sections/CtaBand'
 import { Container } from '@/components/ui/Container'
 import { ButtonLink } from '@/components/ui/Button'
 import { Reveal } from '@/components/ui/Reveal'
-import { getArticles, getProjects, getServices } from '@/lib/content'
+import { RichContent } from '@/components/ui/RichContent'
+import { getArticles, getFeaturedProjects, getPress, getProjects, getServices } from '@/lib/content'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const [projects, services, articles] = await Promise.all([getProjects(), getServices(), getArticles()])
+  const [featured, projects, services, articles, press] = await Promise.all([
+    getFeaturedProjects(),
+    getProjects(),
+    getServices(),
+    getArticles(),
+    getPress(),
+  ])
   const [lead, ...rest] = projects
   const supporting = rest.slice(0, 2)
 
+  const tickerItems: TickerItem[] = [
+    ...press
+      .filter((item) => item.showInTicker)
+      .map((item) => ({
+        label: item.kind === 'award' ? 'Award' : 'Press',
+        text: `${item.title}, ${item.source}`,
+        sample: item.sample,
+      })),
+    ...articles.slice(0, 3).map((article) => ({
+      label: 'Journal',
+      text: article.title,
+      href: `/journal/${article.slug}`,
+    })),
+  ]
+
   return (
     <>
-      <Hero
-        size="full"
-        eyebrow="Architecture & Consultancy · Nairobi"
-        title="Spaces that serve communities and celebrate heritage."
-        image="/images/hero-home.jpg"
-        imageAlt="Sculpted metal facade curving overhead"
-      >
-        <ButtonLink href="/projects" variant="light">
-          View our work
-        </ButtonLink>
-        <ButtonLink href="/contact" variant="outline-light">
-          Start a project
-        </ButtonLink>
-      </Hero>
+      <h1 className="sr-only">Highpeak Consultants, architecture and consultancy in Nairobi, Kenya</h1>
+      <ProjectReel projects={featured} />
+      <Ticker items={tickerItems} />
 
-      {/* Practice */}
-      <section className="py-24 md:py-36">
-        <Container className="grid gap-10 lg:grid-cols-12">
-          <p className="eyebrow text-muted lg:col-span-4">01 — The practice</p>
-          <Reveal className="lg:col-span-8">
-            <p className="font-serif text-3xl leading-[1.15] md:text-5xl">
-              Highpeak Consultants is a contemporary architecture and consultancy practice creating meaningful spaces
-              that serve communities and celebrate cultural heritage.
+      {/* Statement */}
+      <section className="py-28 md:py-44">
+        <Container>
+          <p className="eyebrow text-laterite">01 — The practice · Nairobi, 1°17′ S 36°49′ E</p>
+          <Reveal>
+            <p className="mt-10 max-w-[18ch] font-serif text-[clamp(2.75rem,8vw,8.5rem)] leading-[0.98] tracking-tight">
+              We create meaningful spaces that serve communities and celebrate cultural heritage.
             </p>
-            <div className="mt-10 grid gap-8 text-muted md:grid-cols-2">
-              <p>
-                With expertise across residential, commercial, and institutional projects, we combine innovative design
-                thinking with practical expertise to deliver sustainable and impactful solutions.
-              </p>
-              <p>
-                Our approach prioritizes collaboration, environmental responsibility, and a deep understanding of local
-                context.
-              </p>
-            </div>
-            <ButtonLink href="/about" variant="outline" className="mt-12">
-              About the practice
-            </ButtonLink>
           </Reveal>
+          <div className="mt-14 grid gap-8 md:grid-cols-12">
+            <p className="text-lg text-muted md:col-span-5 md:col-start-6">
+              With expertise across residential, commercial, and institutional projects, we combine innovative design
+              thinking with practical expertise to deliver sustainable and impactful solutions.
+            </p>
+            <div className="md:col-span-2 md:col-start-11 md:justify-self-end">
+              <ButtonLink href="/about" variant="outline">
+                About us
+              </ButtonLink>
+            </div>
+          </div>
         </Container>
       </section>
 
-      {/* Selected work */}
+      {/* Recent projects */}
       {lead && (
         <section className="pb-24 md:pb-36">
           <Container>
@@ -72,7 +83,6 @@ export default async function Home() {
                 All projects →
               </Link>
             </div>
-
             <div className="grid gap-x-8 gap-y-16 lg:grid-cols-12">
               <Reveal className="lg:col-span-7">
                 <ProjectCard project={lead} aspect="aspect-[4/5]" sizes="(min-width: 1024px) 58vw, 100vw" />
@@ -85,13 +95,14 @@ export default async function Home() {
                 ))}
               </div>
             </div>
-
             <ButtonLink href="/projects" variant="outline" className="mt-16 md:hidden">
               All projects
             </ButtonLink>
           </Container>
         </section>
       )}
+
+      <SectorPanels projects={projects} />
 
       {/* Services */}
       <section className="bg-dark py-24 text-light md:py-36">
@@ -106,7 +117,18 @@ export default async function Home() {
               </p>
             </Reveal>
           </div>
-          <ServiceGrid services={services.slice(0, 4)} />
+          <ServiceRows
+            tone="dark"
+            linkTo="page"
+            rows={services.slice(0, 4).map((service) => ({
+              id: service.id,
+              slug: service.slug,
+              name: service.name,
+              image: service.heroImage,
+              imageAlt: service.heroImageAlt,
+              description: <RichContent value={service.description} />,
+            }))}
+          />
         </Container>
       </section>
 
@@ -116,7 +138,7 @@ export default async function Home() {
           <div className="mb-12 flex items-end justify-between gap-6 md:mb-16">
             <div>
               <p className="eyebrow text-muted">04 — Journal</p>
-              <h2 className="mt-4 text-4xl md:text-6xl">Insights & perspectives</h2>
+              <h2 className="mt-4 text-4xl md:text-6xl">Insights &amp; perspectives</h2>
             </div>
             <Link href="/journal" className="link-underline hidden shrink-0 text-sm md:inline-block">
               All articles →
@@ -125,6 +147,10 @@ export default async function Home() {
           <ArticleGrid articles={articles.slice(0, 3)} />
         </Container>
       </section>
+
+      <div className="border-t border-border">
+        <PressSection items={press} eyebrow="05 — Recognition" />
+      </div>
 
       <CtaBand />
     </>

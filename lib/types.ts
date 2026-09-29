@@ -20,11 +20,35 @@ export interface Project {
   heroImage?: string
   heroImageAlt?: string
   gallery?: Picture[]
+  drawing?: Picture
+  featured?: boolean
   description: RichTextValue
   chatbotVisible: boolean
   published: boolean
+  // Placeholder content shown until real content is published in the CMS
+  sample?: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+export interface TeamMember {
+  id: string
+  name: string
+  role: string
+  bio?: string
+  portrait?: Picture
+  sample?: boolean
+}
+
+export interface PressItem {
+  id: string
+  kind: 'press' | 'award'
+  title: string
+  source: string
+  date: Date
+  link?: string
+  showInTicker: boolean
+  sample?: boolean
 }
 
 export interface Service {

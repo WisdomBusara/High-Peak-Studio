@@ -1,10 +1,12 @@
-import type { Project, Service, Article } from '@/lib/types'
+import type { Article, PressItem, Project, Service, TeamMember } from '@/lib/types'
 
 export const mockProjects: Project[] = [
   {
     id: '1',
     title: 'Highpeak Residence',
     slug: 'highpeak-residence',
+    sample: true,
+    featured: true,
     heroImage: '/images/project-residence.jpg',
     heroImageAlt: 'White residential tower with stacked terraces, seen from below',
     category: 'residential',
@@ -21,6 +23,8 @@ export const mockProjects: Project[] = [
     id: '2',
     title: 'Tech Hub Office Complex',
     slug: 'tech-hub-office-complex',
+    sample: true,
+    featured: true,
     heroImage: '/images/project-office.jpg',
     heroImageAlt: 'Glass office towers seen from street level',
     category: 'commercial',
@@ -37,6 +41,8 @@ export const mockProjects: Project[] = [
     id: '3',
     title: 'Cultural Center',
     slug: 'cultural-center',
+    sample: true,
+    featured: true,
     heroImage: '/images/project-cultural.jpg',
     heroImageAlt: 'Sculptural white concrete building against a dark sky',
     category: 'institutional',
@@ -53,6 +59,8 @@ export const mockProjects: Project[] = [
     id: '4',
     title: 'Boutique Hotel',
     slug: 'boutique-hotel',
+    sample: true,
+    featured: true,
     heroImage: '/images/project-hotel.jpg',
     heroImageAlt: 'Whitewashed terrace with a clay urn and a domed tower above the sea',
     category: 'hospitality',
@@ -69,6 +77,7 @@ export const mockProjects: Project[] = [
     id: '5',
     title: 'Residential Estate Master Plan',
     slug: 'residential-estate-master-plan',
+    sample: true,
     heroImage: '/images/project-masterplan.jpg',
     heroImageAlt: 'Aerial view of green tea fields planted in rows',
     category: 'residential',
@@ -85,6 +94,8 @@ export const mockProjects: Project[] = [
     id: '6',
     title: 'Mixed-Use Development',
     slug: 'mixed-use-development',
+    sample: true,
+    featured: true,
     heroImage: '/images/project-mixed-use.jpg',
     heroImageAlt: 'Corner of a timber-clad building against a pale sky',
     category: 'commercial',
@@ -198,5 +209,87 @@ export const mockArticles: Article[] = [
     published: true,
     createdAt: new Date('2024-07-10'),
     updatedAt: new Date('2024-07-10'),
+  },
+]
+
+// Sample team, press and awards so the layout can be shown before Highpeak supplies
+// the real ones. Publications and awards are invented and every item is tagged
+// "Sample" on the site; publishing any real entry in the CMS replaces the whole set.
+export const mockTeam: TeamMember[] = [
+  {
+    id: 'sample-1',
+    name: 'Wanjiru Kamau',
+    role: 'Principal Architect',
+    bio: 'Leads design across residential and cultural projects, from first sketch to handover.',
+    sample: true,
+  },
+  {
+    id: 'sample-2',
+    name: 'Daniel Otieno',
+    role: 'Associate · Project Architect',
+    bio: 'Runs projects day to day and coordinates consultants, approvals and site.',
+    sample: true,
+  },
+  {
+    id: 'sample-3',
+    name: 'Amina Hassan',
+    role: 'Interior Designer',
+    bio: 'Shapes interiors, materials and light, with a focus on hospitality and homes.',
+    sample: true,
+  },
+  {
+    id: 'sample-4',
+    name: 'Brian Mwangi',
+    role: 'Urban Planner',
+    bio: 'Works on master plans, site strategy and the public spaces between buildings.',
+    sample: true,
+  },
+]
+
+export const mockPress: PressItem[] = [
+  {
+    id: 'sample-press-1',
+    kind: 'press',
+    title: 'A terraced home that breathes with the highlands',
+    source: 'Savanna Design Review',
+    date: new Date('2025-06-12'),
+    showInTicker: true,
+    sample: true,
+  },
+  {
+    id: 'sample-award-1',
+    kind: 'award',
+    title: 'Shortlisted · Residential category',
+    source: 'Highlands Built Environment Awards 2025',
+    date: new Date('2025-09-01'),
+    showInTicker: true,
+    sample: true,
+  },
+  {
+    id: 'sample-press-2',
+    kind: 'press',
+    title: 'Five practices shaping the next decade of Kenyan architecture',
+    source: 'Rift Architecture Journal',
+    date: new Date('2025-02-03'),
+    showInTicker: true,
+    sample: true,
+  },
+  {
+    id: 'sample-award-2',
+    kind: 'award',
+    title: 'Commended · Cultural buildings',
+    source: 'Savanna Design Review Annual 2024',
+    date: new Date('2024-12-05'),
+    showInTicker: true,
+    sample: true,
+  },
+  {
+    id: 'sample-press-3',
+    kind: 'press',
+    title: 'Calm, shade and coral stone on the Kilifi coast',
+    source: 'Coast & City Magazine',
+    date: new Date('2024-11-20'),
+    showInTicker: true,
+    sample: true,
   },
 ]

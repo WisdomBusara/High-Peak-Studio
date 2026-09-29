@@ -37,6 +37,7 @@ export function Footer() {
           <div className="lg:col-span-3">
             <p className="eyebrow mb-6 text-light/50">Studio</p>
             <p className="text-light/80">Nairobi, Kenya</p>
+            <p className="mt-1 text-sm tabular-nums text-light/50">1°17′ S 36°49′ E</p>
             <ul className="mt-8 space-y-3">
               <li>
                 <Link href="/privacy" className="link-underline text-light/80 hover:text-light">
