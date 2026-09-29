@@ -96,40 +96,37 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <Hero
-        title="Get In Touch"
-        subtitle="Contact"
-        minHeight="tall"
-        description="We'd love to hear about your project or vision"
+        eyebrow="Contact"
+        title="Let's talk about your project."
+        description="We'd love to hear about your project or vision."
+        image="/images/hero-contact.jpg"
+        imageAlt="Escalators leading up through a glazed concourse"
       />
 
-      <section className="py-16 md:py-24 bg-background">
+      <section className="py-20 md:py-28">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Contact Info */}
-            <div className="space-y-8">
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
+            <div className="space-y-12 lg:col-span-4">
               <div>
-                <h3 className="font-serif text-xl font-bold mb-2">Email</h3>
-                <a href="mailto:hello@highpeak.co.ke" className="text-muted hover:text-text transition-colors">
+                <p className="eyebrow text-muted">Email</p>
+                <a href="mailto:hello@highpeak.co.ke" className="link-underline mt-3 inline-block font-serif text-3xl">
                   hello@highpeak.co.ke
                 </a>
               </div>
               <div>
-                <h3 className="font-serif text-xl font-bold mb-2">Location</h3>
-                <p className="text-muted">
-                  Nairobi, Kenya
-                </p>
+                <p className="eyebrow text-muted">Studio</p>
+                <p className="mt-3 font-serif text-3xl">Nairobi, Kenya</p>
               </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="md:col-span-2">
+            <div className="lg:col-span-8">
               {submitted ? (
-                <div className="space-y-4 p-8 bg-surface border border-border">
-                  <h3 className="font-serif text-2xl font-bold">Thank You! 🎉</h3>
+                <div className="space-y-4 border border-border bg-surface p-8 md:p-12">
+                  <h2 className="text-4xl">Thank you.</h2>
                   <p className="text-muted">
-                    We've received your message and will get back to you within 24 hours. We appreciate your interest in Highpeak.
+                    We&rsquo;ve received your message and will be in touch soon. We appreciate your interest in Highpeak.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
@@ -312,6 +309,6 @@ export default function ContactPage() {
           </div>
         </Container>
       </section>
-    </div>
+    </>
   )
 }

@@ -1,25 +1,24 @@
-import Link from 'next/link'
+import { ButtonLink } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
-import { Button } from '@/components/ui/Button'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <Container className="text-center space-y-6 max-w-2xl">
-        <h1 className="font-serif text-8xl font-bold">404</h1>
-        <h2 className="font-serif text-4xl font-bold">Page Not Found</h2>
-        <p className="text-lg text-muted">
-          The page you're looking for doesn't exist or has been moved.
+    <section className="flex min-h-[100svh] items-end bg-dark text-light">
+      <Container className="pb-20 pt-36">
+        <p className="eyebrow text-light/60">Error 404</p>
+        <h1 className="mt-6 text-6xl leading-[1.02] md:text-8xl">This page doesn&rsquo;t exist.</h1>
+        <p className="mt-6 max-w-xl text-lg text-light/70">
+          The page you&rsquo;re looking for doesn&rsquo;t exist or has been moved.
         </p>
-        <div className="flex justify-center gap-4 pt-4">
-          <Link href="/">
-            <Button>Back to Home</Button>
-          </Link>
-          <Link href="/projects">
-            <Button variant="secondary">View Projects</Button>
-          </Link>
+        <div className="mt-10 flex flex-wrap gap-4">
+          <ButtonLink href="/" variant="light">
+            Back to home
+          </ButtonLink>
+          <ButtonLink href="/projects" variant="outline-light">
+            View projects
+          </ButtonLink>
         </div>
       </Container>
-    </div>
+    </section>
   )
 }

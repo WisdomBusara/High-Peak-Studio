@@ -1,3 +1,14 @@
+import type { ComponentProps } from 'react'
+import type { RichText } from '@payloadcms/richtext-lexical/react'
+
+// Plain text for placeholder content, Lexical JSON for content published in the CMS.
+export type RichTextValue = string | ComponentProps<typeof RichText>['data']
+
+export interface Picture {
+  src: string
+  alt: string
+}
+
 export interface Project {
   id: string
   title: string
@@ -7,7 +18,9 @@ export interface Project {
   year: number
   status: 'completed' | 'in-progress' | 'planning'
   heroImage?: string
-  description: string
+  heroImageAlt?: string
+  gallery?: Picture[]
+  description: RichTextValue
   chatbotVisible: boolean
   published: boolean
   createdAt: Date
@@ -18,8 +31,10 @@ export interface Service {
   id: string
   name: string
   slug: string
-  description: string
+  description: RichTextValue
+  capabilities?: string[]
   heroImage?: string
+  heroImageAlt?: string
   chatbotVisible: boolean
   published: boolean
   createdAt: Date
@@ -31,8 +46,9 @@ export interface Article {
   title: string
   slug: string
   excerpt: string
-  body: string
+  body: RichTextValue
   coverImage?: string
+  coverImageAlt?: string
   author: string
   category: string
   publishedAt: Date

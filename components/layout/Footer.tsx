@@ -1,71 +1,60 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 
+const EXPLORE = [
+  { href: '/projects', label: 'Projects' },
+  { href: '/services', label: 'Services' },
+  { href: '/about', label: 'About' },
+  { href: '/journal', label: 'Journal' },
+  { href: '/contact', label: 'Contact' },
+]
+
 export function Footer() {
   return (
-    <footer className="bg-surface border-t border-border">
-      <Container className="py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <h4 className="font-serif font-bold mb-4">Highpeak</h4>
-            <p className="text-sm text-muted">
-              Contemporary architecture and consultancy practice
-            </p>
+    <footer className="bg-dark text-light">
+      <Container className="py-20 md:py-28">
+        <div className="grid gap-16 lg:grid-cols-12">
+          <div className="lg:col-span-6">
+            <p className="font-serif text-4xl leading-[1.05] md:text-6xl">Let&rsquo;s create spaces that matter.</p>
+            <a href="mailto:hello@highpeak.co.ke" className="link-underline mt-8 inline-block text-lg">
+              hello@highpeak.co.ke
+            </a>
           </div>
 
-          <div>
-            <h5 className="font-bold text-sm uppercase tracking-wide mb-4">Links</h5>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/projects" className="text-muted hover:text-text transition-colors">
-                  Projects
-                </Link>
-              </li>
-              <li>
-                <Link href="/services" className="text-muted hover:text-text transition-colors">
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-muted hover:text-text transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="/journal" className="text-muted hover:text-text transition-colors">
-                  Journal
-                </Link>
-              </li>
+          <nav aria-label="Footer" className="lg:col-span-3">
+            <p className="eyebrow mb-6 text-light/50">Explore</p>
+            <ul className="space-y-3">
+              {EXPLORE.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="link-underline text-light/80 hover:text-light">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-          </div>
+          </nav>
 
-          <div>
-            <h5 className="font-bold text-sm uppercase tracking-wide mb-4">Legal</h5>
-            <ul className="space-y-2 text-sm">
+          <div className="lg:col-span-3">
+            <p className="eyebrow mb-6 text-light/50">Studio</p>
+            <p className="text-light/80">Nairobi, Kenya</p>
+            <ul className="mt-8 space-y-3">
               <li>
-                <Link href="/privacy" className="text-muted hover:text-text transition-colors">
+                <Link href="/privacy" className="link-underline text-light/80 hover:text-light">
                   Privacy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-muted hover:text-text transition-colors">
+                <Link href="/terms" className="link-underline text-light/80 hover:text-light">
                   Terms
                 </Link>
               </li>
             </ul>
           </div>
-
-          <div>
-            <h5 className="font-bold text-sm uppercase tracking-wide mb-4">Contact</h5>
-            <p className="text-sm text-muted">
-              hello@highpeak.co.ke
-            </p>
-          </div>
         </div>
 
-        <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted">
-          <p>&copy; 2026 Highpeak Consultants Ltd. All rights reserved.</p>
-          <p>Crafted with care</p>
+        <div className="mt-20 flex flex-col gap-3 border-t border-light/15 pt-8 text-sm text-light/50 md:flex-row md:justify-between">
+          <p>&copy; {new Date().getFullYear()} Highpeak Consultants Ltd</p>
+          <p>Placeholder photography via Unsplash</p>
         </div>
       </Container>
     </footer>

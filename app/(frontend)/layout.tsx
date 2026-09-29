@@ -51,8 +51,14 @@ export default function RootLayout({
         <meta name="theme-color" content="#F5F3EE" />
       </head>
       <body className="bg-background text-text antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-light focus:px-4 focus:py-3 focus:text-dark"
+        >
+          Skip to content
+        </a>
         <Header />
-        {children}
+        <main id="main">{children}</main>
         <Footer />
         <Chatbot initialMessage="How can I help you today?" />
       </body>

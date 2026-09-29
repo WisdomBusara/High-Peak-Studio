@@ -5,8 +5,9 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-background">
       <Hero
+        eyebrow="Legal"
         title="Terms of Service"
-        minHeight="tall"
+        size="short"
       />
 
       <section className="py-16 md:py-24 bg-background">

@@ -1,0 +1,105 @@
+{
+  "license": "Unsplash License (https://unsplash.com/license) - placeholder photography until real project photos are published in the CMS",
+  "images": [
+    {
+      "file": "hero-home.jpg",
+      "author": "Samuel Zeller",
+      "source": "https://unsplash.com/photos/j0g8taxHZa0"
+    },
+    {
+      "file": "cta-dark-tower.jpg",
+      "author": "Padurariu Alexandru",
+      "source": "https://unsplash.com/photos/ZKBQmgMyf8s"
+    },
+    {
+      "file": "project-residence.jpg",
+      "author": "Julien Moreau",
+      "source": "https://unsplash.com/photos/688Fna1pwOQ"
+    },
+    {
+      "file": "project-office.jpg",
+      "author": "Anthony DELANOIX",
+      "source": "https://unsplash.com/photos/b5POxb2aL9o"
+    },
+    {
+      "file": "project-cultural.jpg",
+      "author": "Carl Nenzen Loven",
+      "source": "https://unsplash.com/photos/busqfOj6i80"
+    },
+    {
+      "file": "project-hotel.jpg",
+      "author": "Anthony DELANOIX",
+      "source": "https://unsplash.com/photos/vNAZubsDWMg"
+    },
+    {
+      "file": "project-masterplan.jpg",
+      "author": "McDobbie Hu",
+      "source": "https://unsplash.com/photos/24tsXm7qGQE"
+    },
+    {
+      "file": "project-mixed-use.jpg",
+      "author": "Samuel Zeller",
+      "source": "https://unsplash.com/photos/WlD3vixTVUg"
+    },
+    {
+      "file": "service-design.jpg",
+      "author": "Sergey Zolkin",
+      "source": "https://unsplash.com/photos/m9qMoh-scfE"
+    },
+    {
+      "file": "service-planning.jpg",
+      "author": "Kelly Sikkema",
+      "source": "https://unsplash.com/photos/Ereoqdv5s48"
+    },
+    {
+      "file": "service-sustainability.jpg",
+      "author": "Ståle Grut",
+      "source": "https://unsplash.com/photos/NUgw97CVdAk"
+    },
+    {
+      "file": "service-management.jpg",
+      "author": "Levi Saunders",
+      "source": "https://unsplash.com/photos/1nz-KjRdg-s"
+    },
+    {
+      "file": "journal-sustainable.jpg",
+      "author": "Dominik Martin",
+      "source": "https://unsplash.com/photos/B6uUPYt7wz4"
+    },
+    {
+      "file": "journal-office.jpg",
+      "author": "Breather",
+      "source": "https://unsplash.com/photos/DEdM9Vs6s8w"
+    },
+    {
+      "file": "journal-heritage.jpg",
+      "author": "Hartmut Tobies",
+      "source": "https://unsplash.com/photos/O9TEKuI1Icw"
+    },
+    {
+      "file": "hero-projects.jpg",
+      "author": "Mika Ruusunen",
+      "source": "https://unsplash.com/photos/ypVM8PnygUo"
+    },
+    {
+      "file": "hero-services.jpg",
+      "author": "Mike Wilson",
+      "source": "https://unsplash.com/photos/rM7B4DheQc0"
+    },
+    {
+      "file": "hero-journal.jpg",
+      "author": "Noah Rosenfield",
+      "source": "https://unsplash.com/photos/Za0O5DovZBc"
+    },
+    {
+      "file": "hero-about.jpg",
+      "author": "Jeff Sheldon",
+      "source": "https://unsplash.com/photos/JWiMShWiF14"
+    },
+    {
+      "file": "hero-contact.jpg",
+      "author": "Erez Attias",
+      "source": "https://unsplash.com/photos/KqVHRmHVwwM"
+    }
+  ]
+}

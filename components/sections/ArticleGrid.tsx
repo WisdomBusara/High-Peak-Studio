@@ -1,55 +1,44 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import { Container } from '@/components/ui/Container'
+import { Reveal } from '@/components/ui/Reveal'
 import type { Article } from '@/lib/types'
 
-interface ArticleGridProps {
-  articles: Article[]
-  limit?: number
+export function formatDate(date: Date) {
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-export function ArticleGrid({ articles, limit }: ArticleGridProps) {
-  const displayedArticles = limit ? articles.slice(0, limit) : articles
-
-  if (displayedArticles.length === 0) {
-    return (
-      <section className="py-16 md:py-24 bg-background">
-        <Container>
-          <p className="text-center text-muted">No articles available yet.</p>
-        </Container>
-      </section>
-    )
-  }
-
+export function ArticleCard({ article, sizes = '(min-width: 768px) 33vw, 100vw' }: { article: Article; sizes?: string }) {
   return (
-    <section className="py-16 md:py-24 bg-background">
-      <Container>
-        <div className="space-y-12">
-          {displayedArticles.map((article) => (
-            <article key={article.id} className="pb-12 border-b border-border last:border-b-0 last:pb-0">
-              <Link href={`/journal/${article.slug}`} className="group">
-                {article.coverImage && (
-                  <div className="relative aspect-video overflow-hidden bg-surface mb-6">
-                    <img
-                      src={article.coverImage}
-                      alt={article.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                <div className="space-y-3">
-                  <div className="flex gap-2 text-sm text-muted">
-                    <span>{article.author}</span>
-                    <span>•</span>
-                    <span>{new Date(article.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                  </div>
-                  <h3 className="font-serif text-3xl font-bold group-hover:underline">{article.title}</h3>
-                  <p className="text-muted text-lg leading-relaxed">{article.excerpt}</p>
-                </div>
-              </Link>
-            </article>
-          ))}
-        </div>
-      </Container>
-    </section>
+    <Link href={`/journal/${article.slug}`} className="group block">
+      <div className="relative aspect-[3/2] overflow-hidden bg-surface">
+        {article.coverImage && (
+          <Image
+            src={article.coverImage}
+            alt={article.coverImageAlt ?? article.title}
+            fill
+            sizes={sizes}
+            className="object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-105"
+          />
+        )}
+      </div>
+      <p className="eyebrow mt-6 text-muted">
+        {article.category} · {formatDate(article.publishedAt)}
+      </p>
+      <h3 className="mt-3 text-2xl md:text-3xl">{article.title}</h3>
+      <p className="mt-3 text-muted">{article.excerpt}</p>
+    </Link>
+  )
+}
+
+export function ArticleGrid({ articles }: { articles: Article[] }) {
+  const columns = articles.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'
+  return (
+    <div className={`grid gap-x-8 gap-y-16 ${columns}`}>
+      {articles.map((article, i) => (
+        <Reveal key={article.id} delay={i * 100}>
+          <ArticleCard article={article} />
+        </Reveal>
+      ))}
+    </div>
   )
 }

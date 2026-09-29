@@ -3,31 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --background: #F5F3EE;
-  --surface: #EAE7DF;
-  --text: #151515;
-  --muted: #686762;
-  --border: #C9C6BD;
-  --dark: #111111;
-  --light: #F7F6F2;
   --gutter: 1rem;
 }
 
 @media (min-width: 1024px) {
   :root {
     --gutter: 2rem;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1a1815;
-    --surface: #2a2620;
-    --text: #f5f3ee;
-    --muted: #9b9894;
-    --border: #4a4740;
-    --dark: #ffffff;
-    --light: #2a2620;
   }
 }
 
@@ -40,52 +21,99 @@ html {
 }
 
 body {
-  @apply bg-background text-text transition-colors;
+  @apply bg-background text-text;
 }
 
-a {
-  @apply transition-colors;
-}
-
-button {
-  @apply transition-all;
-}
-
-/* Fluid typography */
-h1 {
-  @apply font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight;
-}
-
-h2 {
-  @apply font-serif text-3xl md:text-4xl font-bold leading-tight;
-}
-
-h3 {
-  @apply font-serif text-2xl md:text-3xl font-bold leading-tight;
-}
-
-h4 {
-  @apply font-serif text-xl md:text-2xl font-bold;
-}
-
+/* Instrument Serif ships a single weight; never let the browser fake a bold. */
+h1,
+h2,
+h3,
+h4,
 h5 {
-  @apply font-serif text-lg font-bold;
-}
-
-h6 {
-  @apply font-sans text-base font-bold uppercase tracking-wide;
+  @apply font-serif font-normal leading-tight tracking-tight;
 }
 
 p {
   @apply leading-relaxed;
 }
 
-/* Focus states */
 :focus-visible {
-  @apply outline-2 outline-offset-2 outline-text;
+  @apply outline outline-2 outline-offset-4 outline-current;
 }
 
-/* Reduced motion */
+@layer components {
+  .eyebrow {
+    @apply text-xs font-medium uppercase tracking-[0.28em];
+  }
+
+  .link-underline {
+    @apply relative;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current transition-transform duration-300;
+  }
+
+  .link-underline:hover::after,
+  .link-underline[aria-current='page']::after {
+    @apply scale-x-100;
+  }
+
+  .rich-text > * + * {
+    @apply mt-5;
+  }
+
+  .rich-text h2 {
+    @apply mt-12 text-3xl md:text-4xl;
+  }
+
+  .rich-text h3 {
+    @apply mt-10 text-2xl md:text-3xl;
+  }
+
+  .rich-text ul {
+    @apply list-disc pl-6;
+  }
+
+  .rich-text ol {
+    @apply list-decimal pl-6;
+  }
+
+  .rich-text a {
+    @apply underline underline-offset-4;
+  }
+
+  .rich-text blockquote {
+    @apply border-l-2 border-current pl-6 font-serif text-2xl;
+  }
+}
+
+/* Scroll reveal (see components/ui/Reveal.tsx) */
+[data-reveal] {
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+[data-reveal='hidden'] {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+@keyframes hero-settle {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.hero-settle {
+  animation: hero-settle 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -93,10 +121,10 @@ p {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 0.5rem;
   height: 0.5rem;
@@ -107,9 +135,5 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-border rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted;
+  @apply rounded-full bg-border;
 }

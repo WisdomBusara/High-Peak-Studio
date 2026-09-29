@@ -5,8 +5,9 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background">
       <Hero
+        eyebrow="Legal"
         title="Privacy Policy"
-        minHeight="tall"
+        size="short"
       />
 
       <section className="py-16 md:py-24 bg-background">

@@ -1,49 +1,33 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import { Container } from '@/components/ui/Container'
+import { Reveal } from '@/components/ui/Reveal'
+import { RichContent } from '@/components/ui/RichContent'
 import type { Service } from '@/lib/types'
 
-interface ServiceGridProps {
-  services: Service[]
-}
-
-export function ServiceGrid({ services }: ServiceGridProps) {
-  if (services.length === 0) {
-    return (
-      <section className="py-16 md:py-24 bg-background">
-        <Container>
-          <p className="text-center text-muted">No services available yet.</p>
-        </Container>
-      </section>
-    )
-  }
-
+// Designed for the dark band on the home page.
+export function ServiceGrid({ services }: { services: Service[] }) {
   return (
-    <section className="py-16 md:py-24 bg-background">
-      <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-          {services.map((service) => (
-            <Link
-              key={service.id}
-              href={`/services/${service.slug}`}
-              className="group space-y-4 hover:opacity-75 transition-opacity"
-            >
+    <div className="grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+      {services.map((service, i) => (
+        <Reveal key={service.id} delay={i * 100}>
+          <Link href="/services" className="group block">
+            <div className="relative aspect-[4/3] overflow-hidden bg-light/5 sm:aspect-[3/4]">
               {service.heroImage && (
-                <div className="relative aspect-video overflow-hidden bg-surface">
-                  <img
-                    src={service.heroImage}
-                    alt={service.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
+                <Image
+                  src={service.heroImage}
+                  alt={service.heroImageAlt ?? service.name}
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover opacity-80 grayscale transition duration-700 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0"
+                />
               )}
-              <div className="space-y-2">
-                <h3 className="font-serif text-2xl font-bold group-hover:underline">{service.name}</h3>
-                <p className="text-muted leading-relaxed line-clamp-3">{service.description}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Container>
-    </section>
+            </div>
+            <p className="eyebrow mt-6 text-light/50">{String(i + 1).padStart(2, '0')}</p>
+            <h3 className="mt-3 text-3xl">{service.name}</h3>
+            <RichContent value={service.description} className="mt-3 text-light/70" />
+          </Link>
+        </Reveal>
+      ))}
+    </div>
   )
 }

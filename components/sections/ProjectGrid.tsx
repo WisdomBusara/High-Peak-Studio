@@ -1,59 +1,27 @@
-import Link from 'next/link'
-import { Container } from '@/components/ui/Container'
+import { Reveal } from '@/components/ui/Reveal'
+import { ProjectCard } from '@/components/sections/ProjectCard'
 import type { Project } from '@/lib/types'
 
-interface ProjectGridProps {
-  projects: Project[]
-  columns?: 2 | 3
-}
-
-export function ProjectGrid({ projects, columns = 3 }: ProjectGridProps) {
-  const gridClass = columns === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-
+// Two columns with every third project spanning the full width, for an editorial rhythm.
+export function ProjectGrid({ projects }: { projects: Project[] }) {
   if (projects.length === 0) {
-    return (
-      <section className="py-16 md:py-24 bg-background">
-        <Container>
-          <p className="text-center text-muted">No projects available yet.</p>
-        </Container>
-      </section>
-    )
+    return <p className="py-24 text-center text-muted">No projects in this category yet.</p>
   }
 
   return (
-    <section className="py-16 md:py-24 bg-background">
-      <Container>
-        <div className={`grid ${gridClass} gap-6 md:gap-8`}>
-          {projects.map((project) => (
-            <Link
-              key={project.id}
-              href={`/projects/${project.slug}`}
-              className="group overflow-hidden transition-transform hover:scale-95"
-            >
-              <div className="space-y-4">
-                {project.heroImage && (
-                  <div className="relative aspect-square overflow-hidden bg-surface">
-                    <img
-                      src={project.heroImage}
-                      alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
-                <div className="space-y-2">
-                  <h3 className="font-serif text-xl font-bold group-hover:underline">{project.title}</h3>
-                  <div className="flex gap-2 text-sm text-muted">
-                    <span>{project.location}</span>
-                    <span>•</span>
-                    <span>{project.year}</span>
-                  </div>
-                  <p className="text-muted text-sm">{project.category}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Container>
-    </section>
+    <div className="grid gap-x-8 gap-y-16 md:grid-cols-2 md:gap-y-24">
+      {projects.map((project, i) => {
+        const wide = i % 3 === 0
+        return (
+          <Reveal key={project.id} className={wide ? 'md:col-span-2' : ''}>
+            <ProjectCard
+              project={project}
+              aspect={wide ? 'aspect-[4/3] md:aspect-[21/9]' : 'aspect-[4/3]'}
+              sizes={wide ? '100vw' : '(min-width: 768px) 50vw, 100vw'}
+            />
+          </Reveal>
+        )
+      })}
+    </div>
   )
 }

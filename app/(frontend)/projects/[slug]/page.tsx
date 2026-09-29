@@ -1,123 +1,132 @@
+import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Hero } from '@/components/sections/Hero'
+import { ProjectCard, categoryLabel } from '@/components/sections/ProjectCard'
 import { Container } from '@/components/ui/Container'
-import { Button } from '@/components/ui/Button'
-import { ProjectGrid } from '@/components/sections/ProjectGrid'
-import { mockProjects } from '@/lib/mockData'
+import { ButtonLink } from '@/components/ui/Button'
+import { Reveal } from '@/components/ui/Reveal'
+import { RichContent } from '@/components/ui/RichContent'
+import { PROJECT_STATUSES } from '@/lib/constants'
+import { getProjects } from '@/lib/content'
+
+export const dynamic = 'force-dynamic'
 
 interface ProjectPageProps {
-  params: Promise<{
-    slug: string
-  }>
+  params: Promise<{ slug: string }>
 }
 
-export function generateStaticParams() {
-  return mockProjects.map((project) => ({
-    slug: project.slug,
-  }))
+export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const project = (await getProjects()).find((p) => p.slug === slug)
+  return project ? { title: project.title } : {}
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params
-  const project = mockProjects.find((p) => p.slug === slug)
+  const projects = await getProjects()
+  const index = projects.findIndex((p) => p.slug === slug)
+  if (index === -1) notFound()
 
-  if (!project) {
-    notFound()
-  }
+  const project = projects[index]
+  const next = projects[(index + 1) % projects.length]
+  const others = projects.filter((p) => p.id !== project.id && p.id !== next.id)
+  const related = [
+    ...others.filter((p) => p.category === project.category),
+    ...others.filter((p) => p.category !== project.category),
+  ].slice(0, 2)
 
-  const relatedProjects = mockProjects
-    .filter((p) => p.category === project.category && p.id !== project.id)
-    .slice(0, 3)
-
-  const projectIndex = mockProjects.findIndex((p) => p.slug === slug)
-  const nextProject = projectIndex < mockProjects.length - 1 ? mockProjects[projectIndex + 1] : null
+  const facts = [
+    { label: 'Location', value: project.location },
+    { label: 'Year', value: String(project.year) },
+    { label: 'Sector', value: categoryLabel(project.category) },
+    { label: 'Status', value: PROJECT_STATUSES.find((s) => s.value === project.status)?.label ?? project.status },
+  ]
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <Hero
+        size="full"
+        eyebrow={`${categoryLabel(project.category)} · ${project.location}`}
         title={project.title}
-        subtitle={project.category}
-        minHeight="tall"
+        image={project.heroImage}
+        imageAlt={project.heroImageAlt}
       />
 
-      {/* Project Details */}
-      <section className="py-16 md:py-24 bg-background">
+      <section className="border-b border-border">
         <Container>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
-            {/* Main Content */}
-            <div className="md:col-span-2 space-y-8">
-              <div>
-                <h2 className="font-serif text-3xl font-bold mb-4">Overview</h2>
-                <p className="text-lg text-muted leading-relaxed">{project.description}</p>
+          <dl className="grid grid-cols-2 md:grid-cols-4">
+            {facts.map((fact) => (
+              <div key={fact.label} className="border-border py-8 md:border-l md:pl-8 md:first:border-l-0 md:first:pl-0">
+                <dt className="eyebrow text-muted">{fact.label}</dt>
+                <dd className="mt-3 font-serif text-2xl md:text-3xl">{fact.value}</dd>
               </div>
-
-              <div className="aspect-video bg-surface">
-                {project.heroImage && (
-                  <img
-                    src={project.heroImage}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-8">
-              <div className="border-l-2 border-border pl-6 space-y-4">
-                <div>
-                  <p className="text-sm text-muted uppercase tracking-wider mb-1">Location</p>
-                  <p className="font-serif text-lg">{project.location}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted uppercase tracking-wider mb-1">Year</p>
-                  <p className="font-serif text-lg">{project.year}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted uppercase tracking-wider mb-1">Category</p>
-                  <p className="font-serif text-lg capitalize">{project.category}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted uppercase tracking-wider mb-1">Status</p>
-                  <p className="font-serif text-lg capitalize">{project.status.replace('-', ' ')}</p>
-                </div>
-              </div>
-
-              <Link href="/contact">
-                <Button className="w-full">Inquire About Project</Button>
-              </Link>
-            </div>
-          </div>
+            ))}
+          </dl>
         </Container>
       </section>
 
-      {/* Related Projects */}
-      {relatedProjects.length > 0 && (
-        <section className="py-16 md:py-24 bg-surface">
-          <Container>
-            <h2 className="font-serif text-3xl font-bold mb-12">Related Projects</h2>
+      <section className="py-24 md:py-32">
+        <Container className="grid gap-10 lg:grid-cols-12">
+          <p className="eyebrow text-muted lg:col-span-4">Overview</p>
+          <Reveal className="lg:col-span-8">
+            <RichContent value={project.description} className="font-serif text-2xl leading-snug md:text-4xl" />
+            <ButtonLink href="/contact" className="mt-12">
+              Discuss a similar project
+            </ButtonLink>
+          </Reveal>
+        </Container>
+      </section>
+
+      {project.gallery && project.gallery.length > 0 && (
+        <section className="pb-24 md:pb-32">
+          <Container className="grid gap-8 md:grid-cols-2">
+            {project.gallery.map((picture, i) => (
+              <Reveal key={picture.src} className={i % 3 === 0 ? 'md:col-span-2' : ''}>
+                <div className={`relative overflow-hidden bg-surface ${i % 3 === 0 ? 'aspect-[16/9]' : 'aspect-[4/5]'}`}>
+                  <Image src={picture.src} alt={picture.alt} fill sizes={i % 3 === 0 ? '100vw' : '50vw'} className="object-cover" />
+                </div>
+              </Reveal>
+            ))}
           </Container>
-          <ProjectGrid projects={relatedProjects} columns={3} />
         </section>
       )}
 
-      {/* Next Project CTA */}
-      {nextProject && (
-        <section className="py-16 md:py-24 bg-background">
+      {related.length > 0 && (
+        <section className="bg-surface py-24 md:py-32">
           <Container>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-muted uppercase tracking-wider mb-2">Next Project</p>
-                <h3 className="font-serif text-3xl font-bold">{nextProject.title}</h3>
-              </div>
-              <Link href={`/projects/${nextProject.slug}`}>
-                <Button>View Project →</Button>
-              </Link>
+            <h2 className="mb-12 text-4xl md:text-5xl">More projects</h2>
+            <div className="grid gap-x-8 gap-y-16 md:grid-cols-2">
+              {related.map((p) => (
+                <Reveal key={p.id}>
+                  <ProjectCard project={p} />
+                </Reveal>
+              ))}
             </div>
           </Container>
         </section>
       )}
-    </div>
+
+      {next && next.id !== project.id && (
+        <Link href={`/projects/${next.slug}`} className="group relative block overflow-hidden bg-dark text-light">
+          {next.heroImage && (
+            <Image
+              src={next.heroImage}
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover opacity-50 transition duration-[1400ms] group-hover:scale-105 group-hover:opacity-60"
+            />
+          )}
+          <Container className="relative py-28 md:py-40">
+            <p className="eyebrow text-light/60">Next project</p>
+            <p className="mt-6 font-serif text-5xl leading-[1.02] md:text-8xl">
+              {next.title} <span aria-hidden className="inline-block transition-transform duration-300 group-hover:translate-x-3">→</span>
+            </p>
+          </Container>
+        </Link>
+      )}
+    </>
   )
 }
