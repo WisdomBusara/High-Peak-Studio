@@ -9,6 +9,8 @@ red()   { printf '\033[0;31m%s\033[0m\n' "$*"; }
 green() { printf '\033[0;32m%s\033[0m\n' "$*"; }
 info()  { printf '\n\033[0;34m==>\033[0m %s\n' "$*"; }
 fail()  { red "ERROR: $*"; exit 1; }
+# Discard lines pasted ahead of a prompt so they are not taken as answers.
+drain_input() { while read -r -t 0.2 _; do :; done; }
 
 command -v docker >/dev/null || fail "docker is not installed"
 docker compose version >/dev/null 2>&1 || fail "'docker compose' (v2) is required"
@@ -28,6 +30,7 @@ else
   fi
 
   info "Creating .env"
+  drain_input
   read -rp "Public domain [peak.wisdombusara.com]: " DOMAIN
   DOMAIN=${DOMAIN:-peak.wisdombusara.com}
   read -rp "Local port for the app [3100]: " APP_PORT
@@ -100,7 +103,12 @@ green "App and database are running"
 # Created here over loopback, before the site is public, so nobody else can claim the first account.
 if echo "$INIT" | grep -q '"initialized":false'; then
   info "Create the first CMS admin account"
-  read -rp "Admin email: " ADMIN_EMAIL
+  drain_input
+  while true; do
+    read -rp "Admin email: " ADMIN_EMAIL
+    [[ "$ADMIN_EMAIL" =~ ^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$ ]] && break
+    red "Enter a valid email address."
+  done
   while true; do
     read -rsp "Admin password (min 8 characters): " ADMIN_PASSWORD; echo
     if [ ${#ADMIN_PASSWORD} -lt 8 ]; then red "Too short."; continue; fi
@@ -109,12 +117,17 @@ if echo "$INIT" | grep -q '"initialized":false'; then
     red "Passwords did not match."
   done
   export ADMIN_EMAIL ADMIN_PASSWORD
-  docker compose exec -T -e ADMIN_EMAIL -e ADMIN_PASSWORD app node -e \
+  RESPONSE=$(docker compose exec -T -e ADMIN_EMAIL -e ADMIN_PASSWORD app node -e \
     'process.stdout.write(JSON.stringify({email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD, name: "Admin", role: "super-admin"}))' \
-    | curl -fsS -X POST -H 'Content-Type: application/json' --data-binary @- \
-      "http://127.0.0.1:${APP_PORT}/cms-api/users/first-register" >/dev/null \
-    || fail "Could not create the admin user (see: docker compose logs app)"
+    | curl -sS -w '\n%{http_code}' -X POST -H 'Content-Type: application/json' --data-binary @- \
+      "http://127.0.0.1:${APP_PORT}/cms-api/users/first-register")
   unset ADMIN_PASSWORD
+  CODE=${RESPONSE##*$'\n'}
+  if [ "$CODE" != 200 ] && [ "$CODE" != 201 ]; then
+    red "Could not create the admin user (HTTP ${CODE}):"
+    echo "${RESPONSE%$'\n'*}"
+    exit 1
+  fi
   green "Admin account created: ${ADMIN_EMAIL}"
 else
   info "A CMS admin account already exists - skipping"
